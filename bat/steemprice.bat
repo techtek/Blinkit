@@ -18,5 +18,29 @@
 :: Update the STEEM and SBD price in USD into txt files for the steem prices in the Blinkit interface
 	echo %batToolDir0%>C:\blinkit\config\steempricestriped.txt
 	echo %batToolDir2% > C:\blinkit\config\sbdpricestriped.txt
-	  
+	
+
+:: Deletes unwanted characters( "price_usd": "" ) from the steempricestriped.txt and sbdpricestriped.txt and keep only the numeric value
+	SETLOCAL enabledelayedexpansion
+	:: Delete characters from steempricestriped.txt
+	FOR /f "delims=" %%i IN (C:\blinkit\config\steempricestriped.txt) DO (
+	SET line=%%i
+	SET line=!line:"=!
+	SET line=!line:price_usd=!
+	SET line=!line::=!
+	SET line=!line:,=!
+	echo !line! > C:\blinkit\config\steempricestriped.txt
+	)
+	
+	:: Delete characters from sbdpricestriped.txt
+	FOR /f "delims=" %%i IN (C:\blinkit\config\sbdpricestriped.txt) DO (
+	SET line=%%i
+	SET line=!line:"=!
+	SET line=!line:price_usd=!
+	SET line=!line::=!
+	SET line=!line:,=!
+	echo !line! > C:\blinkit\config\sbdpricestriped.txt  
+	)
+	
+
 	 

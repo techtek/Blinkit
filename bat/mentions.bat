@@ -80,7 +80,8 @@
 	
 :main   
 :: Download Mentions data from Web Api and save it into a txt file
-	powershell -Command "Invoke-WebRequest http://api.comprendre-steem.fr/getMentions?username=%steemusername% -OutFile C:\blinkit\config\downloadmentions.txt"
+	powershell -Command "Invoke-WebRequest   "http://api.comprendre-steem.fr/getMentions?comments=Y&own_comments=n&username=techtek"
+ -OutFile C:\blinkit\config\downloadmentions.txt"
     	
 :: Compare the 2 downloaded Mentions txt files if different go to "notification", if the files are the same go to "next"  
     fc C:\blinkit\config\downloadmentions.txt C:\blinkit\config\downloadmentions2.txt > nul

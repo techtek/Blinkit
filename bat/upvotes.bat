@@ -3,8 +3,11 @@
 :: Take and put the username from username.txt and put it in variable %username%
 	set /p steemusername=<c:\blinkit\config\username.txt
  
-:: Get the flashdrive letter set by the user in the Blinkit GUI, stored in /config/ and put it into variable %flashdrive% 
+:: Get the flashdrive letter set by the user in the Blinkit GUI, stored in \config\ and put it into variable %flashdrive% 
 	set /p flashdrive=<c:\blinkit\config\drive.txt
+	
+:: Get the Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklength%
+	set /p blinklength=<c:\blinkit\config\blinklength.txt
     
 :: Colour settings
 	set ESC=
@@ -34,9 +37,9 @@
 	echo %Magenta%USB Flash Drive: %White%%flashdrive%
 	echo.
 
-:: Blink the LED, by copying the LED file from the Blinkit folder to the USB flashdrive
-	echo %Magenta%Testing %White%Blink LED  
-	xcopy c:\blinkit\ledfile\ledfile20MB.led %flashdrive%. /Y > nul
+:: Blink the LED, by copying the LED file from the Blinkit folder to the flashdrive
+	echo %Magenta%Testing %White%Blink LED 
+	xcopy c:\blinkit\ledfile\ledfile%blinklength%.led %flashdrive%. /Y > nul 
 	echo.
 
 
@@ -105,7 +108,7 @@
 	echo %Magenta%ACTION LED BLINKED!
 
 :: Let the user know, there is a new Upvote, and blink the LED by copying the LED file to the flash drive 
-    xcopy c:\blinkit\ledfile\ledfile20MB.led %flashdrive%. /Y > nul 
+    xcopy c:\blinkit\ledfile\ledfile%blinklength%.led %flashdrive%. /Y > nul  
 	
 :: Play windows notification sound
     powershell -c echo `a 	
