@@ -11,7 +11,7 @@ Installation instructions for Windows
 2. Start the Blinkit interface with blinkit.exe  
 3. Enter your Steem username and press save.
 4. Select your USB drive letter and press save.
-5. Everything is ready, the program and buttons to watch for Steem activities can now be used. 
+5. Everything is ready, the program and buttons to test the led and watch for Steem activities can now be used. 
 
 
 
