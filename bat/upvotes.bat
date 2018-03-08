@@ -81,9 +81,12 @@
 	
 :: Blinkit Upvotes Script 
 
-:main   
 :: Download Upvotes data from Web Api and save it into a txt file
 	powershell -Command "Invoke-WebRequest http://api.comprendre-steem.fr/getIncomingVotes?username=%steemusername% -OutFile c:\blinkit\config\downloadvotes.txt"
+
+:main   
+:: Download Upvotes data from Web Api and save it into a txt file
+	powershell -Command "Invoke-WebRequest http://api.comprendre-steem.fr/getIncomingVotes?username=%steemusername% -OutFile c:\blinkit\config\downloadvotes2.txt"
     	
 :: Compare the 2 downloaded follower txt files if different go to "notification", if the files are the same go to "next" 
     fc c:\blinkit\config\downloadvotes.txt c:\blinkit\config\downloadvotes2.txt > nul
@@ -116,5 +119,5 @@
 	echo %White%
 
 :: Download new data to compare, and go back to "main" and continue to look for for new Upvotes.
-	powershell -Command "Invoke-WebRequest http://api.comprendre-steem.fr/getIncomingVotes?username=%steemusername% -OutFile c:\blinkit\config\downloadvotes2.txt"	
+	powershell -Command "Invoke-WebRequest http://api.comprendre-steem.fr/getIncomingVotes?username=%steemusername% -OutFile c:\blinkit\config\downloadvotes.txt"	
 	goto main
