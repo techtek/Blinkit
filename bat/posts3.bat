@@ -3,11 +3,11 @@
 :: Take and put the username from username.txt and put it in variable %username%
 	set /p steemusername=<c:\blinkit\config\username.txt
  
-:: Get the flashdrive letter set by the user in the Blinkit GUI, stored in \config\ and put it into variable %flashdrive% 
-	set /p flashdrive=<c:\blinkit\config\drive.txt
+:: Get the flashdrive letter set by the user in the Blinkit GUI, stored in \config\ and put it into variable %flashdrive3% 
+	set /p flashdrive3=<c:\blinkit\config\drive3.txt
 
-:: Get the Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklength%
-	set /p blinklength=<c:\blinkit\config\blinklength.txt
+:: Get the Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklength3%
+	set /p blinklength3=<c:\blinkit\config\blinklength3.txt
     
 :: Colour settings
 	set ESC=
@@ -32,13 +32,13 @@
 	powershell -c echo `a
 	  
 	  
-:: Let the user know the led is going to be blinked, on the %flashdrive% letter by displaying the text:  	  
-	echo %Magenta%USB Flash Drive: %White%%flashdrive%
+:: Let the user know the led is going to be blinked, on the %flashdrive3% letter by displaying the text:  	  
+	echo %Magenta%USB Flash Drive: %White%%flashdrive3%
 	echo.
 	echo %Magenta%Testing %White%Blink LED 
 
 :: Blink the LED, by copying the LED file from the Blinkit folder to the USB flashdrive	
-	xcopy c:\blinkit\ledfile\ledfile%blinklength%.led %flashdrive%. /Y > nul  
+	xcopy c:\blinkit\ledfile\ledfile%blinklength3%.led %flashdrive3%. /Y > nul  
 	echo.
 
 
@@ -75,7 +75,7 @@
 :: Display the saved Username and Flash drive letter and let the user know that the program is starting to look for new Posts
 	echo.
 	echo %White%Preparing BlinkIt, 
-	echo USB Flash Notifications for %Blue%%steemusername%%White% on USB flash drive: %flashdrive% ...	  
+	echo USB Flash Notifications for %Blue%%steemusername%%White% on USB flash drive: %flashdrive3% ...	  
 	timeout 4 
 	  
 
@@ -114,7 +114,7 @@
 	echo %Magenta%ACTION LED BLINKED! 
   
 :: Let the user know, there is a new Post, and blink the LED by copying the LED file to the flash drive
-	xcopy c:\blinkit\ledfile\ledfile%blinklength%.led %flashdrive%. /Y > nul  
+	xcopy c:\blinkit\ledfile\ledfile%blinklength3%.led %flashdrive3%. /Y > nul  
 	
 :: Play windows notification sound
 	powershell -c echo `a 

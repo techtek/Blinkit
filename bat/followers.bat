@@ -3,7 +3,7 @@
 :: Take and put the username from username.txt and put it in variable %username%
 	set /p steemusername=<c:\blinkit\config\username.txt
  
-:: Get the flashdrive letter set by the user in the Blinkit GUI, stored in /config/ and put it into variable %flashdrive% 
+:: Get the flashdrive letter set by the user in the Blinkit GUI, stored in \config\ and put it into variable %flashdrive% 
 	set /p flashdrive=<c:\blinkit\config\drive.txt
 
 :: Get the Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklength%
