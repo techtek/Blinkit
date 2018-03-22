@@ -1,19 +1,19 @@
 [
     {
-        "id": "bitcoin", 
-        "name": "Bitcoin", 
-        "symbol": "BTC", 
-        "rank": "1", 
-        "price_usd": "7561.82", 
-        "price_btc": "1.0", 
-        "24h_volume_usd": "5454610000.0", 
-        "market_cap_usd": "127995335276", 
-        "available_supply": "16926525.0", 
-        "total_supply": "16926525.0", 
-        "max_supply": "21000000.0", 
-        "percent_change_1h": "0.97", 
-        "percent_change_24h": "-4.42", 
-        "percent_change_7d": "-20.27", 
-        "last_updated": "1521398667"
+        "id": "neo", 
+        "name": "NEO", 
+        "symbol": "NEO", 
+        "rank": "8", 
+        "price_usd": "70.1572", 
+        "price_btc": "0.00803421", 
+        "24h_volume_usd": "153998000.0", 
+        "market_cap_usd": "4560218000.0", 
+        "available_supply": "65000000.0", 
+        "total_supply": "100000000.0", 
+        "max_supply": "100000000.0", 
+        "percent_change_1h": "1.08", 
+        "percent_change_24h": "-3.77", 
+        "percent_change_7d": "2.34", 
+        "last_updated": "1521761047"
     }
 ]

@@ -12,9 +12,10 @@
 :: Blink the LED, by copying the LED file from the Blinkit folder to the flashdrive
 	xcopy c:\blinkit\ledfile\ledfile%blinklength3%.led %flashdrive3%. /Y > nul    
 
-	echo %blinklength3% 
+::	echo %blinklength3% 
+	
 :: wait 3 second
-	timeout 3
+	:: timeout 3
 
 :: Close the program	
 	cls

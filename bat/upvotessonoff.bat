@@ -3,11 +3,11 @@
 :: Take and put the username from username.txt and put it in variable %username%
 	set /p steemusername=<c:\blinkit\config\username.txt
  
-:: Get the flashdrive letter set by the user in the Blinkit GUI, stored in \config\ and put it into variable %flashdrive% 
-	set /p flashdrive=<c:\blinkit\config\drive.txt
-	
-:: Get the Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklength%
-	set /p blinklength=<c:\blinkit\config\blinklength.txt
+:: Get the Sonoff IP/Hostname set by the user in the Blinkit GUI, stored in \config\ and put it into variable %ip% 
+	set /p ip=<c:\blinkit\config\sonoffip.txt
+
+:: Get the Sonoff Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklengthsonoff%
+	set /p blinklengthsonoff=<c:\blinkit\config\blinklengthsonoff.txt
     
 :: Colour settings
 	set ESC=
@@ -20,8 +20,6 @@
 :: Display welcome message to the user welcome.txt      
 	type c:\blinkit\config\welcome.txt
 
-
-
 :: Let the user know that Blinkit is going to watch for Upvotes by displaying the text:
 	echo Blinkit - Steem Account Upvotes
 
@@ -30,17 +28,15 @@
 	echo %Magenta%Testing %White%Play sound...
 	
 :: Play and test windows notification sound	
-	powershell -c echo `a  
-	  
-:: Let the user know the led is going to be blinked, on the %flashdrive% letter by displaying the text:  	  
-	echo %Magenta%USB Flash Drive: %White%%flashdrive%
+	powershell -c echo `a
+ 
+:: Let the user know the Sonoff Smart switch is going to be blinked, on the %ip%  by displaying the text:  	  
+	echo %Magenta%Sonoff Smart Switch IP: %White%%ip%
 	echo.
-
-:: Blink the LED, by copying the LED file from the Blinkit folder to the flashdrive
-	echo %Magenta%Testing %White%Blink LED 
-	xcopy c:\blinkit\ledfile\ledfile%blinklength%.led %flashdrive%. /Y > nul 
+	echo %Magenta%Testing %White%Blink light
+	timeout 4 
+	call c:\blinkit\bat\blinksonoff.bat 	
 	echo.
-
 
 ::  Download the latest STEEM and SBD Price and put it inside a txt files
 	powershell -Command "Invoke-WebRequest https://api.coinmarketcap.com/v1/ticker/steem/ -OutFile c:\blinkit\config\steemprice.txt"
@@ -71,10 +67,10 @@
 	type c:\blinkit\config\displayfollowers.txt 
 	echo.
 
-:: Display the saved Username and Flash drive letter and let the user know that the program is starting to look for new Followers
+:: Display the saved Username and IP/Hostname of the Sonoff, and let the user know that the program is starting to look for new Upvotes
 	echo.
 	echo %White%Preparing BlinkIt, 
-	echo USB Flash Notifications for %Blue%%steemusername%%White% on USB flash drive: %flashdrive% ...	  
+	echo Notifications for %Blue%%steemusername%%White% on Sonoff: %Blue%%ip%%White% ...	  
 	timeout 4 
 
 	
@@ -99,10 +95,7 @@
 	echo %Magenta%Blinkit is running...
   	
 :: Download new data to compare, into "downloadvotes2.txt", and go back to "main" to compare the files again
-	::powershell -Command "Invoke-WebRequest http://api.comprendre-steem.fr/getIncomingVotes?username=%steemusername% -OutFile c:\blinkit\config\downloadvotes2.txt" 
-    powershell -Command "Invoke-WebRequest http://api.comprendre-steem.fr/getStatus?username=%steemusername% -OutFile c:\blinkit\config\downloadvotes2.txt" 
-
-	
+	powershell -Command "Invoke-WebRequest http://api.comprendre-steem.fr/getStatus?username=%steemusername% -OutFile c:\blinkit\config\downloadvotes2.txt" 
 	goto main
 
     
@@ -110,14 +103,13 @@
 :: Let the user know, there is a new Upvote! by displaying the text:   
 	echo Blinkit is running... %Blue%NEW UPVOTE for %steemusername%!
 	echo %White%  
-	echo %Magenta%ACTION LED BLINKED!
-
-:: Let the user know, there is a new Upvote, and blink the LED by copying the LED file to the flash drive 
-    xcopy c:\blinkit\ledfile\ledfile%blinklength%.led %flashdrive%. /Y > nul  
+	echo %Magenta%ACTION SONOFF BLINKED!
 	
-:: Play the notification sound 
-    powershell -c echo `a 
-	timeout 3	
+:: Play notification sound	
+	powershell -c echo `a  
+
+:: Let the user know, there is a new Post, blink the light connected to the Sonoff device
+	call c:\blinkit\bat\blinksonoff.bat 
 	echo %White%
 
 :: Download new data to compare, and go back to "main" and continue to look for for new Upvotes.

@@ -3,11 +3,11 @@
 :: Take and put the username from username.txt and put it in variable %username%
 	set /p steemusername=<c:\blinkit\config\username.txt
  
-:: Get the flashdrive letter set by the user in the Blinkit GUI, stored in \config\ and put it into variable %flashdrive% 
-	set /p flashdrive=<c:\blinkit\config\drive.txt
+:: Get the Sonoff IP/Hostname set by the user in the Blinkit GUI, stored in \config\ and put it into variable %ip% 
+	set /p ip=<c:\blinkit\config\sonoffip.txt
 
-:: Get the Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklength%
-	set /p blinklength=<c:\blinkit\config\blinklength.txt
+:: Get the Sonoff Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklengthsonoff%
+	set /p blinklengthsonoff=<c:\blinkit\config\blinklengthsonoff.txt
     
 :: Colour settings
 	set ESC=
@@ -20,34 +20,22 @@
 :: Display welcome message to the user welcome.txt      
 	type c:\blinkit\config\welcome.txt
 	
-	
 :: Let the user know that Blinkit is going to watch for Posts by displaying the text:
 	echo Blinkit - Steem Account Posts
 
-:: Let the user know a sound is being played by writing the text:
+:: Let the user know a sound is being played by displaying the text:
 	echo.
 	echo %Magenta%Testing %White%Play sound...
 
-:: Play the notification sound that is set for usb stick 1 	  
-	set /p sound=<c:\blinkit\config\sound.txt 
-	set "file=C:\blinkit\sounds\%sound%"
-	( echo Set Sound = CreateObject("WMPlayer.OCX.7"^)
-	echo Sound.URL = "%file%"
-	echo Sound.Controls.play
-	echo do while Sound.currentmedia.duration = 0
-	echo wscript.sleep 100
-	echo loop
-	echo wscript.sleep (int(Sound.currentmedia.duration^)+1^)*1000) >sound.vbs
-	start /min sound.vbs
-	echo.  
-	  
-:: Let the user know the led is going to be blinked, on the %flashdrive% letter by displaying the text:  	  
-	echo %Magenta%USB Flash Drive: %White%%flashdrive%
+:: Play and test windows notification sound	
+	powershell -c echo `a  
+		 
+:: Let the user know the Sonoff Smart switch is going to be blinked, on the %ip%  by displaying the text:  	  
+	echo %Magenta%Sonoff Smart Switch IP: %White%%ip%
 	echo.
-	echo %Magenta%Testing %White%Blink LED 
-
-:: Blink the LED, by copying the LED file from the Blinkit folder to the USB flashdrive	
-	xcopy c:\blinkit\ledfile\ledfile%blinklength%.led %flashdrive%. /Y > nul  
+	echo %Magenta%Testing %White%Blink light
+	timeout 4
+	call c:\blinkit\bat\blinksonoff.bat 	
 	echo.
 
 
@@ -81,10 +69,10 @@
 	type C:\blinkit\config\displayfollowers.txt 
 	echo.
 	  
-:: Display the saved Username and Flash drive letter and let the user know that the program is starting to look for new Posts
+:: Display the saved Username and IP/Hostname and let the user know that the program is starting to look for new Posts
 	echo.
 	echo %White%Preparing BlinkIt, 
-	echo USB Flash Notifications for %Blue%%steemusername%%White% on USB flash drive: %flashdrive% ...	  
+	echo Notifications for %Blue%%steemusername%%White% on Sonoff: %ip% ...	  
 	timeout 4 
 	  
 
@@ -111,37 +99,24 @@
 	echo.
 	echo %Magenta%Blinkit is running...
 	
-:: Download new data to compare, into "download2.txt", and go back to "main" to compare the files again
+:: Download new data to compare, into "downloadposts2.txt", and go back to "main" to compare the files again
 	powershell -Command "Invoke-WebRequest https://api.steem.place/getPostCount/?a=%steemusername% -OutFile C:\blinkit\config\downloadposts2.txt" 
 	goto main
 
 	
 :notification
 :: Let the user know, there is a new Post! by displaying the text:  
-	echo Blinkit is running... %Blue%NEW Post from %steemusername%!
+	echo Blinkit is running... %Blue%NEW POST from %steemusername%!
 	echo %White%
-	echo %Magenta%ACTION LED BLINKED! 
+	echo %Magenta%ACTION SONOFF BLINKED! 
   
-:: Let the user know, there is a new Post, and blink the LED by copying the LED file to the flash drive
-	xcopy c:\blinkit\ledfile\ledfile%blinklength%.led %flashdrive%. /Y > nul  
-	
+:: Play notification sound	
+	powershell -c echo `a    
+  
+:: Let the user know, there is a new Post, blink the light connected to the Sonoff device	
 	call c:\blinkit\bat\blinksonoff.bat 
-	
-	
-	
-:: Play the notification sound that is set for usb stick 1 
-	start /min sound.vbs
-	timeout 1
 	echo %White%
 
-:: Download new data to compare, and go back to "main" and continue to look for for new posts.
+:: Download new data to compare, and go back to "main" and continue to look for for new Posts.
 	powershell -Command "Invoke-WebRequest https://api.steem.place/getPostCount/?a=%steemusername% -OutFile C:\blinkit\config\downloadposts.txt"	
-	goto main
-
-	
-:: The username.txt must be ASCII encoding more about this here:
-:: https://stackoverflow.com/questions/854360/visual-studio-inserts-invalid-characters-in-batch-files
-:: https://stackoverflow.com/questions/10024445/encoding-to-be-used-for-ansi-vb-net
-
-	
-    
+	goto main  

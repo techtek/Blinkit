@@ -13,8 +13,9 @@
 	xcopy c:\blinkit\ledfile\ledfile%blinklength2%.led %flashdrive2%. /Y > nul    
 
 	echo %blinklength2% 
+	
 :: wait 3 second
-	timeout 3
+	:: timeout 3
 
 :: Close the program	
 	cls
