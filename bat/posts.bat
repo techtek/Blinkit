@@ -8,6 +8,12 @@
 
 :: Get the Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklength%
 	set /p blinklength=<c:\blinkit\config\blinklength.txt
+	
+:: Check if a sound notification is set On/Off,  stored in \config\ and put it into variable %soundsetting%
+	set /p soundsetting=<c:\blinkit\config\soundsetting.txt	
+	
+:: Get the sound set by the user in the Blinkit GUI, stored in \config\ and put it into variable %sound%
+	set /p sound=<c:\blinkit\config\sound.txt
     
 :: Colour settings
 	set ESC=
@@ -28,7 +34,7 @@
 	echo.
 	echo %Magenta%Testing %White%Play sound...
 
-:: Play the notification sound that is set for usb stick 1 	  
+:: Play and test Sound notification	
 	set /p sound=<c:\blinkit\config\sound.txt 
 	set "file=C:\blinkit\sounds\%sound%"
 	( echo Set Sound = CreateObject("WMPlayer.OCX.7"^)
@@ -37,8 +43,9 @@
 	echo do while Sound.currentmedia.duration = 0
 	echo wscript.sleep 100
 	echo loop
-	echo wscript.sleep (int(Sound.currentmedia.duration^)+1^)*1000) >sound.vbs
-	start /min sound.vbs
+	echo wscript.sleep (int(Sound.currentmedia.duration^)+1^)*1000) >C:\blinkit\sounds\sound.vbs
+	
+	if %soundsetting%==On (start /min C:\blinkit\sounds\sound.vbs) else (echo Sound notifications are turned off) 
 	echo.  
 	  
 :: Let the user know the led is going to be blinked, on the %flashdrive% letter by displaying the text:  	  
@@ -127,12 +134,11 @@
 	
 	call c:\blinkit\bat\blinksonoff.bat 
 	
-	
-	
-:: Play the notification sound that is set for usb stick 1 
-	start /min sound.vbs
-	timeout 1
-	echo %White%
+:: Play the notification sound if turned on by the user 
+	if %soundsetting%==On (start /min C:\blinkit\sounds\sound.vbs) else (echo Sound notifications are turned off) 
+	echo.
+	timeout 3	
+	echo %White% 
 
 :: Download new data to compare, and go back to "main" and continue to look for for new posts.
 	powershell -Command "Invoke-WebRequest https://api.steem.place/getPostCount/?a=%steemusername% -OutFile C:\blinkit\config\downloadposts.txt"	

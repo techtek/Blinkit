@@ -1,5 +1,5 @@
 Set Sound = CreateObject("WMPlayer.OCX.7")
-Sound.URL = "C:\blinkit\sounds\ToasterDing.wav"
+Sound.URL = "C:\blinkit\sounds\DripEcho.wav"
 Sound.Controls.play
 do while Sound.currentmedia.duration = 0
 wscript.sleep 100

@@ -8,6 +8,12 @@
 
 :: Get the Sonoff Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklengthsonoff%
 	set /p blinklengthsonoff=<c:\blinkit\config\blinklengthsonoff.txt
+	
+:: Check if a sound notification is set On/Off,  stored in \config\ and put it into variable %soundsetting%
+	set /p soundsetting=<c:\blinkit\config\soundsetting.txt	
+	
+:: Get the sound set by the user in the Blinkit GUI, stored in \config\ and put it into variable %sound%
+	set /p sound=<c:\blinkit\config\sound.txt
     
 :: Colour settings
 	set ESC=
@@ -27,8 +33,19 @@
     echo.
 	echo %Magenta%Testing %White%Play sound...
 	
-:: Play and test windows notification sound	
-	powershell -c echo `a
+:: Play and test Sound notification	
+	set /p sound=<c:\blinkit\config\sound.txt 
+	set "file=C:\blinkit\sounds\%sound%"
+	( echo Set Sound = CreateObject("WMPlayer.OCX.7"^)
+	echo Sound.URL = "%file%"
+	echo Sound.Controls.play
+	echo do while Sound.currentmedia.duration = 0
+	echo wscript.sleep 100
+	echo loop
+	echo wscript.sleep (int(Sound.currentmedia.duration^)+1^)*1000) >C:\blinkit\sounds\sound.vbs
+	
+	if %soundsetting%==On (start /min C:\blinkit\sounds\sound.vbs) else (echo Sound notifications are turned off) 
+	echo.
  
 :: Let the user know the Sonoff Smart switch is going to be blinked, on the %ip%  by displaying the text:  	  
 	echo %Magenta%Sonoff Smart Switch IP: %White%%ip%
@@ -105,8 +122,11 @@
 	echo %White%  
 	echo %Magenta%ACTION SONOFF BLINKED!
 	
-:: Play notification sound	
-	powershell -c echo `a  
+:: Play the notification sound if turned on by the user 
+	if %soundsetting%==On (start /min C:\blinkit\sounds\sound.vbs) else (echo Sound notifications are turned off) 
+	echo.
+	timeout 3	
+	echo %White%   
 
 :: Let the user know, there is a new Post, blink the light connected to the Sonoff device
 	call c:\blinkit\bat\blinksonoff.bat 

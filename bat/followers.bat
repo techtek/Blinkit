@@ -8,6 +8,12 @@
 
 :: Get the Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklength%
 	set /p blinklength=<c:\blinkit\config\blinklength.txt
+	
+:: Check if a sound notification is set On/Off,  stored in \config\ and put it into variable %soundsetting%
+	set /p soundsetting=<c:\blinkit\config\soundsetting.txt	
+	
+:: Get the sound set by the user in the Blinkit GUI, stored in \config\ and put it into variable %sound%
+	set /p sound=<c:\blinkit\config\sound.txt
     
 :: Colour settings
 	set ESC=
@@ -20,17 +26,26 @@
 :: Display welcome message to the user welcome.txt      
 	type c:\blinkit\config\welcome.txt
 	
-	
 :: Let the user know that Blinkit is going to watch for Followers by displaying the text:
 	echo Blinkit - Steem Account Followers
 
-:: Let the user know a sound is being played by writing the text:
-	echo.
+:: Let the user know a sound is being played by displaying the text:
+    echo.
 	echo %Magenta%Testing %White%Play sound...
-
-:: Play and test windows notification sound	
-	powershell -c echo `a
-	  
+	
+:: Play and test Sound notification	
+	set /p sound=<c:\blinkit\config\sound.txt 
+	set "file=C:\blinkit\sounds\%sound%"
+	( echo Set Sound = CreateObject("WMPlayer.OCX.7"^)
+	echo Sound.URL = "%file%"
+	echo Sound.Controls.play
+	echo do while Sound.currentmedia.duration = 0
+	echo wscript.sleep 100
+	echo loop
+	echo wscript.sleep (int(Sound.currentmedia.duration^)+1^)*1000) >C:\blinkit\sounds\sound.vbs
+	
+	if %soundsetting%==On (start /min C:\blinkit\sounds\sound.vbs) else (echo Sound notifications are turned off) 
+	echo.
 	  
 :: Let the user know the led is going to be blinked, on the %flashdrive% letter by displaying the text:  	  
 	echo %Magenta%USB Flash Drive: %White%%flashdrive%
@@ -113,9 +128,10 @@
 :: Let the user know, there is a new Follower, and blink the LED by copying the LED file to the flash drive
 	xcopy c:\blinkit\ledfile\ledfile%blinklength%.led %flashdrive%. /Y > nul  
 	
-:: Play windows notification sound
-	powershell -c echo `a 
-	timeout 1
+:: Play the notification sound if turned on by the user 
+	if %soundsetting%==On (start /min C:\blinkit\sounds\sound.vbs) else (echo Sound notifications are turned off) 
+	echo.
+	timeout 3	
 	echo %White%
 
 :: Download new data to compare, and go back to "main" and continue to look for for new Followers.

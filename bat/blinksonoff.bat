@@ -1,6 +1,6 @@
 @echo off
   
-:: Get the IP or Hostname set by the user in the Blinkit GUI, stored in \config\sonoffip and put it into variable %ip%   
+:: Get the IP or Hostname set by the user in the Blinkit GUI, stored in \config\sonoffip.txt and put it into variable %ip%   
 	set /p ip=<c:\blinkit\config\sonoffip.txt
 	
 :: Get the Blink length set by the user in the Blinkit GUI, stored in \config\ and put it into variable %blinklengthsonoff%
