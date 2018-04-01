@@ -5,7 +5,7 @@
  ||    ||  ||        ||   |   |||   ||  ||    ||     ||   
 .||...|'  .||.....| .||. .|.   '|  .||.  ||. .||.   .||.
                                                   
-USB Flash Notifications Version 1.3 
+USB Flash Notifications Version 1.4 
 Made by Techtek https://steemit.com/@techtek/
 
 Starting...

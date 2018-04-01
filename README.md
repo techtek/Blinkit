@@ -15,6 +15,16 @@ Installation instructions for Windows
 
 
 
+
+Philips Hue
+To be able to use Philips Hue lights with Blinkit, a Authenticated user ID needs to be created on your Philips Hue bridge,
+this can be done with the CLIP API Debugger tool, described on this page:
+https://www.developers.meethue.com/documentation/getting-started
+
+
+
+
+
 Made by @techtek
 https://steemit.com/@techtek
 

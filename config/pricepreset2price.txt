@@ -1,19 +1,19 @@
 [
     {
-        "id": "neo", 
-        "name": "NEO", 
-        "symbol": "NEO", 
-        "rank": "9", 
-        "price_usd": "59.901", 
-        "price_btc": "0.00731216", 
-        "24h_volume_usd": "143776000.0", 
-        "market_cap_usd": "3893565000.0", 
-        "available_supply": "65000000.0", 
-        "total_supply": "100000000.0", 
-        "max_supply": "100000000.0", 
-        "percent_change_1h": "5.66", 
-        "percent_change_24h": "-9.21", 
-        "percent_change_7d": "-14.67", 
-        "last_updated": "1522105447"
+        "id": "gridcoin", 
+        "name": "GridCoin", 
+        "symbol": "GRC", 
+        "rank": "307", 
+        "price_usd": "0.0399188", 
+        "price_btc": "0.00000589", 
+        "24h_volume_usd": "10809.5", 
+        "market_cap_usd": "15580817.0", 
+        "available_supply": "390312753.0", 
+        "total_supply": "390312753.0", 
+        "max_supply": null, 
+        "percent_change_1h": "0.26", 
+        "percent_change_24h": "5.02", 
+        "percent_change_7d": "-10.38", 
+        "last_updated": "1522624444"
     }
 ]
