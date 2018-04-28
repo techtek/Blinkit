@@ -1,17 +1,17 @@
 # Blinkit
 
+Blinkit is a Steem notification software for Windows, that notifies you in real time with sound and light about Steem account activity.
+Blinkit can blink the lights of the following products:
 
-
-Steem notification software that notifies you in "real-time" with sound and light about Steem account activity.
-The light notifications are realised with the use of a regular USB stick, by writing to the stick and activating the led when new steem activities are detected.
+- Regular USB sticks,
+- Sonoff Smart switches
+- Philips hue lights 
 
 Installation instructions for Windows
 
-1. Download the content of the Blinkit folder here on github and copy it into c:\blinkit
-2. Start the Blinkit interface with blinkit.exe  
-3. Enter your Steem username and press save.
-4. Select your USB drive letter and press save.
-5. Everything is ready, the program and buttons to test the led and watch for Steem activities can now be used. 
+1. Download the content of the Blinkit folder 
+2. Extract the Blinkit folder
+3. Open the Blinkit folder, and start Blinkit.exe
 
 
 
