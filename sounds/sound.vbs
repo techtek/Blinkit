@@ -1,5 +1,5 @@
 Set Sound = CreateObject("WMPlayer.OCX.7")
-Sound.URL = "sounds\DripEcho.wav"
+Sound.URL = "sounds\SpaceGlitters.wav"
 Sound.Controls.play
 do while Sound.currentmedia.duration = 0
 wscript.sleep 100

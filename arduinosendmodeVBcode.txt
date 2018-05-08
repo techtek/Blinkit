@@ -1,0 +1,42 @@
+Imports System.IO
+
+Public Class Form1
+
+    ' Connect to Arduino with the saved settings COM, BAUD, saved by the user in the Blinkit interface
+    Dim WithEvents SerialPort As New IO.Ports.SerialPort
+
+    Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        ConnectSerial()
+        Me.Visible = False
+
+    End Sub
+
+    Private Sub ConnectSerial()
+        Try
+            SerialPort.BaudRate = My.Computer.FileSystem.ReadAllText("config\arduinobaudrate.txt")
+            SerialPort.PortName = My.Computer.FileSystem.ReadAllText("config\arduinocomport.txt")
+            SerialPort.Open()
+        Catch
+            SerialPort.Close()
+        End Try
+    End Sub
+
+    'Sending the preferred mode to Arduino (Single led, RGB etc)
+    Sub New()
+        InitializeComponent()
+        ' get the saved mode from arduinomode.txt
+        Dim ArduinoMode As String
+        ArduinoMode = My.Computer.FileSystem.ReadAllText("config\arduinomode.txt")
+
+        ' Write the mode to the Arduino 
+        If SerialPort.IsOpen Then
+            SerialPort.Write(ArduinoMode)
+            SerialPort.Close()
+        Else
+            ConnectSerial()
+            SerialPort.Write(ArduinoMode)
+            SerialPort.Close()
+        End If
+        Me.Close()
+    End Sub
+End Class

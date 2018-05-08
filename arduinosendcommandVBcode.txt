@@ -1,0 +1,42 @@
+Imports System.IO
+
+Public Class Form1
+    ' Connect with Arduino with the saved settings COM, BAUD, saved by the user in the Blinkit interface 
+    Dim WithEvents SerialPort As New IO.Ports.SerialPort
+
+    Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        ConnectSerial()
+        Me.Visible = False
+    End Sub
+
+    Private Sub ConnectSerial()
+        Try
+            SerialPort.BaudRate = My.Computer.FileSystem.ReadAllText("config\arduinobaudrate.txt")
+            SerialPort.PortName = My.Computer.FileSystem.ReadAllText("config\arduinocomport.txt")
+            SerialPort.Open()
+        Catch
+            SerialPort.Close()
+        End Try
+    End Sub
+
+    'Sending the command to the Arduino 
+    Sub New()
+        InitializeComponent()
+
+        ' get the saved command from arduinocommand.txt
+        Dim ArduinoCommand As String
+        ArduinoCommand = My.Computer.FileSystem.ReadAllText("config\arduinocommand.txt")
+
+        ' Write the Command to the Arduino 
+        If SerialPort.IsOpen Then
+            SerialPort.Write(ArduinoCommand)
+            SerialPort.Close()
+        Else
+            ConnectSerial()
+            SerialPort.Write(ArduinoCommand)
+            SerialPort.Close()
+        End If
+        Me.Close()
+    End Sub
+End Class
+

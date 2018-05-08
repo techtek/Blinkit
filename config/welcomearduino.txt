@@ -1,0 +1,14 @@
+
+'||''|.   '||'      '||' '|.   '|' '||'  |'  '||' |''||''|
+ ||   ||   ||        ||   |'|   |   || .'     ||     ||   
+ ||'''|.   ||        ||   | '|. |   ||'|.     ||     ||   
+ ||    ||  ||        ||   |   |||   ||  ||    ||     ||   
+.||...|'  .||.....| .||. .|.   '|  .||.  ||. .||.   .||.
+                                                  
+USB Flash Notifications Version 2.1 
+Made by Techtek https://steemit.com/@techtek/ 
+
+Arduino Sketch made by Electronicsworld https://steemit.com/@Electronicsworld/
+
+Starting...
+
