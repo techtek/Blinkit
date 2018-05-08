@@ -6,6 +6,7 @@ Blinkit can blink the lights of the following products:
 - Regular USB sticks,
 - Sonoff Smart switches
 - Philips hue lights 
+- Arduino Prototyping boards
 
 Installation instructions for Windows
 
