@@ -25,6 +25,7 @@ https://www.developers.meethue.com/documentation/getting-started
 Arduino
 To be able to use a Arduino with Blinkit, the custom made sketch needs to be uploaded to your Arduino with the Arduino IDE.
 The Sketch file arduinosketch.ino is located in the root folder of Blinkit. 
+The wiring diagram arduinowiring3xsingleled.png is located in the root folder of Blinkit 
 The Arduino integration into Blinkit is done in collaboration with: @electronicsworld https://steemit.com/@electronicsworld 
 
 
