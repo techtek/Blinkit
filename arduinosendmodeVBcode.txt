@@ -7,6 +7,10 @@ Public Class Form1
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ConnectSerial()
+
+        ' Sleep 2 second to let the files update
+        Threading.Thread.Sleep(2000) ' 2000 milliseconds = 2.0 seconds
+
         Me.Visible = False
 
     End Sub
@@ -31,10 +35,18 @@ Public Class Form1
         ' Write the mode to the Arduino 
         If SerialPort.IsOpen Then
             SerialPort.Write(ArduinoMode)
+
+            ' Sleep 2 second to let the files update
+            Threading.Thread.Sleep(2000) ' 2000 milliseconds = 2.0 seconds
+
             SerialPort.Close()
         Else
             ConnectSerial()
             SerialPort.Write(ArduinoMode)
+
+            ' Sleep 2 second to let the files update
+            Threading.Thread.Sleep(2000) ' 2000 milliseconds = 2.0 seconds
+
             SerialPort.Close()
         End If
         Me.Close()
