@@ -5,7 +5,7 @@
  ||    ||  ||        ||   |   |||   ||  ||    ||     ||   
 .||...|'  .||.....| .||. .|.   '|  .||.  ||. .||.   .||.
                                                   
-USB Flash Notifications Version 2.2 
+USB Flash Notifications Version 2.3 
 Made by Techtek https://steemit.com/@techtek/ 
 
 Arduino Sketch made by Electronicsworld https://steemit.com/@Electronicsworld/
