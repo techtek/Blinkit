@@ -7,7 +7,7 @@ Blinkit can blink the lights of the following products:
 - Sonoff Smart switches
 - Philips hue lights 
 - Arduino Prototyping boards
-- Logitech devices (list)
+- Logitech devices (full list of supported devices https://www.scribd.com/document/251929274/Logitech-Gaming-Led-SDK)
 
 Installation instructions for Windows
 
