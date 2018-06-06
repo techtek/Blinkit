@@ -10,3 +10,6 @@
 timeout %time%
 
 	taskkill /im webcamled.exe
+	
+	:: Close the program
+	exit

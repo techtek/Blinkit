@@ -11,4 +11,6 @@
 		
 	:: call bat\webcamled.exe 	
 	taskkill /im webcamled.exe
-	
+
+	cls	
+exit

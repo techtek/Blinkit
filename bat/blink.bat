@@ -17,4 +17,4 @@
 	timeout 3
 
 :: Close the program	
-	cls
+	exit
