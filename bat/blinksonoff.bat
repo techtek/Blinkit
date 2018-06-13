@@ -24,7 +24,7 @@
 :: Close the program	
 	cls
 	
-	exit
+
 	
 	
 	

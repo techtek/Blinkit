@@ -1,5 +1,5 @@
 Set Sound = CreateObject("WMPlayer.OCX.7")
-Sound.URL = "sounds\SpaceGlitters.wav"
+Sound.URL = "sounds\Succession.wav"
 Sound.Controls.play
 do while Sound.currentmedia.duration = 0
 wscript.sleep 100

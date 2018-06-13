@@ -4,16 +4,16 @@
         "name": "Steem", 
         "symbol": "STEEM", 
         "rank": "32", 
-        "price_usd": "2.47341", 
-        "price_btc": "0.00032348", 
-        "24h_volume_usd": "2553120.0", 
-        "market_cap_usd": "640022771.0", 
-        "available_supply": "258761294.0", 
-        "total_supply": "275735388.0", 
+        "price_usd": "2.36606", 
+        "price_btc": "0.00030719", 
+        "24h_volume_usd": "5907510.0", 
+        "market_cap_usd": "612385347.0", 
+        "available_supply": "258820718.0", 
+        "total_supply": "275794812.0", 
         "max_supply": null, 
-        "percent_change_1h": "6.69", 
-        "percent_change_24h": "6.87", 
-        "percent_change_7d": "7.06", 
-        "last_updated": "1528302252"
+        "percent_change_1h": "0.42", 
+        "percent_change_24h": "1.93", 
+        "percent_change_7d": "0.26", 
+        "last_updated": "1528379053"
     }
 ]
