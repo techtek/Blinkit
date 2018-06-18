@@ -58,7 +58,7 @@ void breath(){
 
 while (Serial.available() == NULL){ //run below fading pattern till some data is detected over serial
  
- for (int i = 0; i <=240; i+=1){ //This loop will light up/dim linearly the led till it goes from off state to a value close to
+ for (int i = 0; i <=255; i+=1){ //This loop will light up/dim linearly the led till it goes from off state to a value close to
                                  //R=110 G=0 B=255 the starting value for our fading pattern
 
     if (Serial.available() > 0){ // 
@@ -86,56 +86,57 @@ while (Serial.available() == NULL){ //run below fading pattern till some data is
       break;
       }
       
- for (int i = 110; i <=255; i+=1){    //In this for loop we will handle the first transition from R=110 G=0 B=255 (darker Violet) to 
-                                      //R=255 G=10 B=255 (much brighter Violet) and have chosen to use the redIntensity as the variable part of the FOR loop
-                                      //based on the value of R = i we will calculate the Green brightness.
+ for (int i = 127; i <=465; i+=1){    
+   
    if (Serial.available() > 0){ // 
       analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
       analogWrite(GreenPIN, 0); //
       analogWrite(BluePIN, 0); //
       break;
       }
+
+      /////////////////////////////////////////////////////////////////////////////////////////////
+      //     first transition from R=110 G=0 B=255 (darker Violet) to R=255 G=10 B=255           //
+      //   (much brighter Violet) and have chosen to use the redIntensity as the variable        //
+      //part of the FOR loop based on the value of R = i we will calculate the Green brightness. //
+      /////////////////////////////////////////////////////////////////////////////////////////////
       
- redIntensity = i;
- greenIntensity = ((118937/10000)*log(i)-(559050/10000)); //The neperien logarithmic function usually wrote as ln(x) 
-                                                          //is not recognized in Arduino coding by using ln but log
-                                                          
-if(greenIntensity> 10){ //based on the aproximation in calculations we do this just in case not to pass the value
-  greenIntensity =10;
-}
-if(greenIntensity< 1){ //based on the aproximation in the calculations this serves to not let
-  greenIntensity =0;   //the Green pin turns negative 
-}
-
-analogWrite(RedPIN, redIntensity);     //
-analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
-analogWrite(BluePIN, blueIntensity);   //
-delay(10);                             //
-}
-
-for (int i = 10; i <=220; i+=1){ //using this For loop we handle the linear transition between the bright Violet (R=255 G=10 B=255) 
-                                 //and the White colour (R=255 G=255 b=255)
-                                 
-   if (Serial.available() > 0){ // 
-      analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-      analogWrite(GreenPIN, 0); //
-      analogWrite(BluePIN, 0); //
-      break;
+ if(i<=255){
+       redIntensity = i;
+       greenIntensity = ((118937/10000)*log(i)-(559050/10000)); //The neperien logarithmic function usually wrote as ln(x) 
+                                                             //is not recognized in Arduino coding by using ln but log 
+    if(greenIntensity> 10){ //based on the aproximation in calculations we do this just in case not to pass the value
+        greenIntensity =10;
       }
-      
-   redIntensity=255;
-   blueIntensity=255;
-   greenIntensity=i;
+    if(greenIntensity< 1){ //based on the aproximation in the calculations this serves to not let
+        greenIntensity =0;   //the Green pin turns negative 
+      }
+  }
+  
 
+ ////////////////////////////////////////////////////////////////////
+ // linear transition between the bright Violet (R=255 G=10 B=255) //
+ //       and the White colour (R=255 G=220 B=255)                 //
+ ////////////////////////////////////////////////////////////////////
+ 
+ if(i>255){ 
+     redIntensity=255;
+     blueIntensity=255;
+     greenIntensity= i-245;
+    }
+       
 analogWrite(RedPIN, redIntensity);     //
 analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
 analogWrite(BluePIN, blueIntensity);   //
 delay(10);                             //
 }
 
-//below we reverse the loops used before to fade from Violet to White and use them to do the other way (from White to Violet)
-for (int i = 220; i >=10; i-=1){ //using this For loop we handle the linear transition between the White colour (R=255 G=255 b=255)  
-                                 //and the bright Violet (R=255 G=10 B=255)
+////////////////////////////////////////////////////////////////////////
+// below we reverse the loop used before to fade from Violet to White // 
+//    and use it to do the other way (from White to Violet)           //
+////////////////////////////////////////////////////////////////////////
+
+for (int i = 465; i >=127; i-=1){
                                  
   if (Serial.available() > 0){ // 
       analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
@@ -144,39 +145,41 @@ for (int i = 220; i >=10; i-=1){ //using this For loop we handle the linear tran
       break;
       }
       
-   redIntensity=255;
-   blueIntensity=255;
-   greenIntensity=i;
-
-analogWrite(RedPIN, redIntensity);     //
-analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
-analogWrite(BluePIN, blueIntensity);   //
-delay(10);                             //
-}
-
-for (int i = 255; i >=110; i-=1){ //In this for loop we will handle the transition from R=255 G=10 B=255 (much brighter Violet) to 
-                                  // R=110 G=0 B=255 (darker Violet) and as before have chosen to use the redIntensity as the variable part of the FOR loop
-                                  //based on the value of R = i we will calculate the Green brightness.
-   if (Serial.available() > 0){ // 
-      analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-      analogWrite(GreenPIN, 0); //
-      analogWrite(BluePIN, 0); //
-      break;
-      }
-      
-redIntensity = i;
-greenIntensity = ((118937/10000)*log(i)-(559050/10000));
+ ///////////////////////////////////////////////////////////////////    
+ //linear transition between the White colour (R=255 G=220 B=255) //
+ //       and the bright Violet (R=255 G=10 B=255)                //
+ ///////////////////////////////////////////////////////////////////
  
-if(greenIntensity<1){ //based ont he aproximations this will keep us on the safe side.
-  greenIntensity =0;
-  }
-analogWrite(RedPIN, redIntensity);     //
-analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
-analogWrite(BluePIN, blueIntensity);   //
-delay(10);                             //
-}}
+    if(i>255){ 
+        redIntensity=255;
+        blueIntensity=255;
+        greenIntensity= i-245;
+       }
 
-for (int i = 255; i >=0; i-=1){ //This loop will dim linearly the led till it goes totally of
+      ///////////////////////////////////////////////////////////////////
+      //       transition from R=255 G=10 B=255 to R=110 G=0 B=255     //
+      ///////////////////////////////////////////////////////////////////
+      
+ if(i<=255){
+  
+       redIntensity = i;
+       greenIntensity = ((118937/10000)*log(i)-(559050/10000)); 
+    
+    if(greenIntensity< 2){   //based on the aproximation in the calculations this serves to not let
+        greenIntensity =0;   //the Green pin turns negative and let it go to zero when the loop ends
+      }
+  }
+    
+      analogWrite(RedPIN, redIntensity);     //
+      analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
+      analogWrite(BluePIN, blueIntensity);   //
+      delay(10);                             //
+      }
+
+  }
+
+
+for (int i = 255; i >=0; i-=1){ //This loop will dim linearly the led till it goes totally off
                                 //since we went back to R=110 G=0 B=255 with a quick calculation and a good aproximation 
                                 //we set the step to take for each brightness decrease so that they get dimmed simultaneously and of the same ammount each time
 
@@ -187,7 +190,7 @@ for (int i = 255; i >=0; i-=1){ //This loop will dim linearly the led till it go
       break;
       }
       
-redIntensity = i/3;
+redIntensity = i/2;
 blueIntensity = i ;
  
 analogWrite(RedPIN, redIntensity);     //
@@ -405,7 +408,7 @@ if(ledmode[0]== 1){
                 Serial.println(" ");
               }
               if (EFFECT[0]==4){
-                Serial.println("Effect for upvote is: FIRE");
+                Serial.println("Effect for upvote is: FIRE 1");
                 Serial.println(" ");
               }
                           
@@ -435,7 +438,7 @@ if(ledmode[0]== 1){
                 Serial.println(" ");
               }
               if (EFFECT[1]==5){
-                Serial.println("Effect for follower is: FIRE");
+                Serial.println("Effect for follower is: FIRE 1");
                 Serial.println(" ");
               }
                             
@@ -465,7 +468,7 @@ if(ledmode[0]== 1){
                 Serial.println(" ");
               }
               if (EFFECT[2]==5){
-                Serial.println("Effect for post is: FIRE");
+                Serial.println("Effect for post is: FIRE 1");
                 Serial.println(" ");
               }
          }
@@ -474,618 +477,157 @@ if(ledmode[0]== 1){
 
 void setLEDon(char* data) {
   //if Arduino receives the command u from serial (upvote detected)
-if (data[0] == 'u') {             
-   if(ledmode[0]==1){ //if ledmode is set to 3 single colour led mode
-       if (EFFECT[0]== 1){ // if the effect selected is normal blinking
-           for (int a= 0; a< Nofblinks[0]; a++){ //repeat the blinking effect as per the Nofblinks[0] value
-                if (Serial.available() > 0){ // 
-                    analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-                    analogWrite(GreenPIN, 0); //
-                    analogWrite(BluePIN, 0); //
-                    break;
-                    }
-              //do the blinking  
-                 analogWrite(RedPIN, 255); //turn on the led 
-                 delay(blinkdelay[0]);
-                 analogWrite(RedPIN, 0);//turn off the led
-                 delay(blinkdelay[0]);
-             }
-       }
-    if (EFFECT[0]== 2){ // if the effect selected is fading effect
-         for (int a= 0; a< Nofblinks[0]; a++){ //repeat the fading effect as per the Nofblinks[0] value
-              for (int f=0; f<=255; f++){
-             
-                 if (Serial.available() > 0){ // 
-                    analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-                    analogWrite(GreenPIN, 0); //
-                    analogWrite(BluePIN, 0); //
-                    break;
-                   }   
-                   
-           /////////////////////////////////////////
-           // led will fade in from 0% brightness //
-           //       to 100% brightness            //
-           /////////////////////////////////////////
-
-                   analogWrite(RedPIN, f); // activate the led
-                   delay((blinkdelay[0]/20));
-              }
-           for (int f=255; f>=0; f--){
-            
-                if (Serial.available() > 0){ // 
-                    analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-                    analogWrite(GreenPIN, 0); //
-                    analogWrite(BluePIN, 0); //
-                    break;
-                    }   
-                    
-            ///////////////////////////////////////////
-            // led will fade in from 100% brightness //
-            //      0% brightness back and forth     //
-            ///////////////////////////////////////////
-                                   
-               analogWrite(RedPIN, f); // activate the led
-               delay((blinkdelay[0]/20));
-            }
-        }
-    }
- }
- 
- if(ledmode[0]==2){
-    if (EFFECT[0]== 1){ // if the effect selected is normal blinking
-        for (int a= 0; a< Nofblinks[0]; a++){ //repeat the blinking effect as per the Nofblinks[0] value
-             if (Serial.available() > 0){ // 
-                 analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-                 analogWrite(GreenPIN, 0); //
-                 analogWrite(BluePIN, 0); //
-                 break;
-                 }
-           //do the blinking  
-           analogWrite(RedPIN, BRIGHTU[0]);
-           analogWrite(GreenPIN, BRIGHTU[1]); //turn on the led using the stored R G B values
-           analogWrite(BluePIN, BRIGHTU[2]);
-           delay(blinkdelay[0]);
-           analogWrite(RedPIN, 0);
-           analogWrite(GreenPIN, 0);//turn of the led
-           analogWrite(BluePIN, 0);
-           delay(blinkdelay[0]);
-          }
-       }
-    if (EFFECT[0]== 2){ // if the effect selected is fading effect
-       unsigned int PERIOD = (blinkdelay[0]*10);
-       double OMEGA = 2*PI/PERIOD; //use a double variable since OMEGA can contain decimals
-       int count=1;// variable to count the number of oscillations
-       StartTime= millis();
-     
-      while (count <= Nofblinks[0]){ //loop to be used to repeat the pattern as per Nofblinks[0] value
-               if (Serial.available() > 0){ /////////////////////////////////////// 
-                 analogWrite(RedPIN, 0);    //turn off the led when any new data //
-                 analogWrite(GreenPIN, 0);  //  is received and exit the loop    //
-                 analogWrite(BluePIN, 0);   ///////////////////////////////////////
-                 break;
-                 }   
-                 
-                CurrentTime= millis();
-               /////////////////////////////////////////////////////
-               //  led, set to an R G B value will fade using a   //
-               // sine wave from 0% brightness to 100% brightness //
-               /////////////////////////////////////////////////////
-
-               int FadeRed= ((BRIGHTU[0]/2) + (BRIGHTU[0]/2)*(cos(OMEGA*CurrentTime)));    ///////////////////////////////////////////////
-               int FadeGreen= ((BRIGHTU[1]/2) + (BRIGHTU[1]/2)*(cos(OMEGA*CurrentTime)));  // let the value of the brightness oscillate //
-               int FadeBlue= ((BRIGHTU[2]/2) + (BRIGHTU[2]/2)*(cos(OMEGA*CurrentTime)));   // between 0% and 100% of the set RGB colour //
-                                                                                           //     with the variation of a sine wave     //
-                                                                                           ///////////////////////////////////////////////
-
-               if ((unsigned long)(millis() - StartTime) >= PERIOD){ ///////////////////////////////////////////////////////////////////////////
-                count++;                                             // every full oscillation increase the counter and take the current time //
-                StartTime= millis();                                 //  as the new starting point to calculate next period of oscilation     //
-               }                                                     ///////////////////////////////////////////////////////////////////////////
-               
-                analogWrite(RedPIN, FadeRed);
-                analogWrite(GreenPIN, FadeGreen);// activate the led
-                analogWrite(BluePIN, FadeBlue);
-                
-
-               if (count == Nofblinks[0] ){
-                analogWrite(RedPIN, 0);
-                analogWrite(GreenPIN, 0);// turn off the led
-                analogWrite(BluePIN, 0);
-                break;
-                }
-          }              
-    }
-
-                  
-if (EFFECT[0]== 3){ // if the chosen effect for this led is rainbow effect
-         int redrainbow;
-         int greenrainbow;
-         int bluerainbow;
-   for (int a= 0; a< Nofblinks[0]; a++){  //repeat the rainbow effect as per the Nofblinks[0] value
-      for (int y = 0; y < 768; y++){
-        
-        if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-       if (y <= 255){          //zone1
-             redrainbow = 255 - y;    // red goes from on to off
-             greenrainbow = y;        // green goes from off to on
-             bluerainbow = 0;         // blue is always off
-             }
-       else if (y <= 511){     // zone 2
-             redrainbow = 0;                 // red is always off
-             greenrainbow = 255 - (y - 256); // green on to off
-             bluerainbow = (y - 256);        // blue off to on
-             }
-       else{ // color >= 512       // zone 3
-             redrainbow = (y - 512);         // red off to on
-             greenrainbow = 0;               // green is always off
-             bluerainbow = 255 - (y - 512);  // blue on to off
-             }
-             
-       /////////////////////////////////////////////////
-       // Now that the Intensity values have been set,//
-       // activate the LED with those values          //
-       /////////////////////////////////////////////////
-       
-            analogWrite(RedPIN, redrainbow);
-            analogWrite(BluePIN, bluerainbow);
-            analogWrite(GreenPIN, greenrainbow);
-            delay((blinkdelay[0]/30));                    
-            }
+if (data[0] == 'u') { 
+      //if ledmode is set to 3 single colour led mode      
+   if(ledmode[0]==1){ 
+           // if the effect selected is normal blinking
+       if (EFFECT[0]== 1){ 
+          blink1(RedPIN, Nofblinks[0], blinkdelay[0]);
          }
-         
-         //////////////////////////////////////////////
-         // final off after the whole rainbow is done//
-         //////////////////////////////////////////////
-         
-          delay(500);
-          redrainbow = 0;    // red off
-          greenrainbow = 0;        // green off
-          bluerainbow = 0;             // blue off
-          analogWrite(RedPIN, redrainbow);
-          analogWrite(BluePIN, bluerainbow);
-          analogWrite(GreenPIN, greenrainbow);
+           // if the effect selected is fading effect
+       if (EFFECT[0]== 2){ 
+          fade1(RedPIN, Nofblinks[0], blinkdelay[0]); 
+         }
       }
-      
-if (EFFECT[0]==4){ // if the chosen effect for this led is ice effect
-   for (int a= 0; a< Nofblinks[0]; a++){//repeat the ice effect as per the Nofblinks[0] value
-       if (Serial.available() > 0){ // 
-          analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-          analogWrite(GreenPIN, 0); //
-          analogWrite(BluePIN, 0); //
-          break;
-          }
-          
-    for (int y=0; y<=240; y++){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-        // fade in till full blue-ice brightness
-        analogWrite(GreenPIN, y); //
-        analogWrite(BluePIN, y); //
-        delay((blinkdelay[0]/20));  
-        }
-    for (int x=0; x<=255; x++){
-        if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, x); //mix red proportionally to reach white colour
-         analogWrite(GreenPIN, 255); //
-         analogWrite(BluePIN, 255); //
-         delay ((blinkdelay[0]/20));
-         }
-    for (int z=255; z>=0; z--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-      
-         analogWrite(RedPIN, z); // reverse the action to fade out
-         analogWrite(GreenPIN, 255); //
-         analogWrite(BluePIN, 255); //
-         delay ((blinkdelay[0]/20));
-         }
-    for (int w=255; w>=0; w--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, 0); // fade out blue ice till all off
-         analogWrite(GreenPIN, w); //
-         analogWrite(BluePIN, w); //
-         delay((blinkdelay[0]/20));  
-         }
-     }
-     analogWrite(RedPIN, 0); // turn off the led
-     analogWrite(GreenPIN, 0); // just to make sure it is off
-     analogWrite(BluePIN, 0); //
-  }
-
-      
-if (EFFECT[0]==5){ // if the chosen effect for this led is fire effect
-  for (int a= 0; a< Nofblinks[0]; a++){ //repeat the rainbow effect as per the Nofblinks[1] value
-     for (int y=0; y<=255; y++){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-        analogWrite(RedPIN, y);// fade in till full red brightness
-        delay((blinkdelay[0]/20));  
-        }
-    for (int x=0; x<=40; x++){
-        if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, 255); //mix green proportionally to the red in order to 
-         analogWrite(GreenPIN, x); // blend the colours
-         delay ((blinkdelay[0]/20));
-         }
-         
-    for (int z=40; z>=0; z--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-      
-         analogWrite(RedPIN, 255); // reverse the action to fade out
-         analogWrite(GreenPIN, z); //
-         delay ((blinkdelay[0]/20));
-         }
-    for (int w=255; w>=0; w--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, w); // fade out red till off
-         delay((blinkdelay[0]/20));  
-         }
-     }
-     analogWrite(RedPIN, 0); // turn off the led
-     analogWrite(GreenPIN, 0); //
-  }  
+     // if ledmode is set to rgb led mode 
+  if(ledmode[0]==2){
+        // if the effect selected is normal blinking
+    if (EFFECT[0]== 1){ 
+        blink2(Nofblinks[0], blinkdelay[0], BRIGHTU[0], BRIGHTU[1], BRIGHTU[2]);
+       }
+        // if the effect selected is fading effect
+    if (EFFECT[0]== 2){ 
+       unsigned int P = (blinkdelay[0]*10);
+       double O = 2*PI/P; 
+       fade2(P, O, Nofblinks[0], BRIGHTU[0], BRIGHTU[1], BRIGHTU[2]);               
+      }
+        // if the effect selected is rainbow effect          
+    if (EFFECT[0]== 3){ 
+       rainbow( Nofblinks[0], blinkdelay[0]);
+      }
+       // if the effect selected is ice effect
+    if (EFFECT[0]==4){ 
+      ice(Nofblinks[0], blinkdelay[0]);
+      }
+        // if the effect selected is fire effect
+    if (EFFECT[0]==5){ 
+      fire(Nofblinks[0], blinkdelay[0]);
+      }  
   }
  Serial.println("you got an upvote ");
  Serial.println(" "); 
 }
       
 //if Arduino receives the command f from serial (follower)   
-if (data[0] == 'f') { //if Arduino detects the trigger command f from serial (follower)    
-    if(ledmode[0]==1){    // if ledmode is set to 3 single colour led mode
-        if (EFFECT[1]== 1){ // if the effect selected is normal blinking
-           for (int a= 0; a< Nofblinks[1]; a++){ //repeat the blinking effect as per the Nofblinks[1] value
-                if (Serial.available() > 0){ // 
-                    analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-                    analogWrite(GreenPIN, 0); //
-                    analogWrite(BluePIN, 0); //
-                    break;
-                    }
-              //do the blinking  
-                 analogWrite(GreenPIN, 255); //turn on the led 
-                 delay(blinkdelay[1]);
-                 analogWrite(GreenPIN, 0);//turn off the led
-                 delay(blinkdelay[1]);
-             }
-       }
-    if (EFFECT[1]== 2){ // if the effect selected is fading effect
-         for (int a= 0; a< Nofblinks[1]; a++){ //repeat the fading effect as per the Nofblinks[0] value
-              for (int f=0; f<=255; f++){
-             
-                 if (Serial.available() > 0){ // 
-                    analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-                    analogWrite(GreenPIN, 0); //
-                    analogWrite(BluePIN, 0); //
-                    break;
-                   }   
-                   
-           /////////////////////////////////////////
-           // led will fade in from 0% brightness //
-           //       to 100% brightness            //
-           /////////////////////////////////////////
-
-                   analogWrite(GreenPIN, f); // activate the led
-                   delay(blinkdelay[1]);
-              }
-           for (int f=255; f>=0; f--){
-            
-                if (Serial.available() > 0){ // 
-                    analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-                    analogWrite(GreenPIN, 0); //
-                    analogWrite(BluePIN, 0); //
-                    break;
-                    }   
-                    
-            ///////////////////////////////////////////
-            // led will fade in from 100% brightness //
-            //      0% brightness back and forth     //
-            ///////////////////////////////////////////
-                                   
-               analogWrite(GreenPIN, f); // activate the led
-               delay(blinkdelay[1]);
-            }
-        }
-    }
- }
-      
-    if(ledmode[0]==2){ //and if ledmode is set to 1 RGB led
-       if (EFFECT[1]== 1){ // if the effect selected is normal blinking
-        for (int a= 0; a< Nofblinks[1]; a++){ //repeat the blinking effect as per the Nofblinks[1] value
-             if (Serial.available() > 0){ // 
-                 analogWrite(RedPIN, 0);    //turn off the led if data is received and exit the loop immediately
-                 analogWrite(GreenPIN, 0); //
-                 analogWrite(BluePIN, 0); //
-                 break;
-                 }
-           //activate the led and let it blink        
-           analogWrite(RedPIN, BRIGHTF[0]);
-           analogWrite(GreenPIN, BRIGHTF[1]); //light up the led using the previously stored settings
-           analogWrite(BluePIN, BRIGHTF[2]);
-           delay(blinkdelay[1]);
-           analogWrite(RedPIN, 0);
-           analogWrite(GreenPIN, 0); //turn the led off
-           analogWrite(BluePIN, 0);
-           delay(blinkdelay[1]);
+if (data[0] == 'f') { 
+      // if ledmode is set to 3 single colour led mode    
+   if(ledmode[0]==1){  
+            // if the effect selected is normal blinking  
+        if (EFFECT[1]== 1){ 
+           blink1(GreenPIN, Nofblinks[1], blinkdelay[1]);
           }
-       }
-   if (EFFECT[1]== 2){ // if the effect selected is fading effect
-       unsigned int PERIOD = (blinkdelay[1]*10);
-       double OMEGA = 2*PI/PERIOD; //use a double variable since OMEGA can contain decimals
-       int count=1;// variable to count the number of oscillations
-       StartTime= millis();
-     
-      while (count <= Nofblinks[1]){ //loop to be used to repeat the pattern as per Nofblinks[1] value
-               if (Serial.available() > 0){ /////////////////////////////////////// 
-                 analogWrite(RedPIN, 0);    //turn off the led when any new data //
-                 analogWrite(GreenPIN, 0);  //  is received and exit the loop    //
-                 analogWrite(BluePIN, 0);   ///////////////////////////////////////
-                 break;
-                 }   
-                 
-                CurrentTime= millis();
-               /////////////////////////////////////////////////////
-               //  led, set to an R G B value will fade using a   //
-               // sine wave from 0% brightness to 100% brightness //
-               /////////////////////////////////////////////////////
-
-               int FadeRed= ((BRIGHTF[0]/2) + (BRIGHTF[0]/2)*(cos(OMEGA*CurrentTime)));    ///////////////////////////////////////////////
-               int FadeGreen= ((BRIGHTF[1]/2) + (BRIGHTF[1]/2)*(cos(OMEGA*CurrentTime)));  // let the value of the brightness oscillate //
-               int FadeBlue= ((BRIGHTF[2]/2) + (BRIGHTF[2]/2)*(cos(OMEGA*CurrentTime)));   // between 0% and 100% of the set RGB colour //
-                                                                                           //     with the variation of a sine wave     //
-                                                                                           ///////////////////////////////////////////////
-
-               if ((unsigned long)(millis() - StartTime) >= PERIOD){ ///////////////////////////////////////////////////////////////////////////
-                count++;                                             // every full oscillation increase the counter and take the current time //
-                StartTime= millis();                                 //  as the new starting point to calculate next period of oscilation     //
-               }                                                     ///////////////////////////////////////////////////////////////////////////
-               
-                analogWrite(RedPIN, FadeRed);
-                analogWrite(GreenPIN, FadeGreen);// activate the led
-                analogWrite(BluePIN, FadeBlue);
-                
-
-               if (count == Nofblinks[1] ){
-                analogWrite(RedPIN, 0);
-                analogWrite(GreenPIN, 0);// turn off the led
-                analogWrite(BluePIN, 0);
-                break;
-                }
-          }              
-    }
-
-      
-if (EFFECT[1]== 3){ // if the chosen effect for this led is rainbow effect
-         int redrainbow;
-         int greenrainbow;
-         int bluerainbow;
-   for (int a= 0; a< Nofblinks[1]; a++){  //repeat the rainbow effect as per the Nofblinks[1] value
-      for (int y = 0; y < 768; y++){
-        
-        if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-       if (y <= 255){          //zone1
-             redrainbow = 255 - y;    // red goes from on to off
-             greenrainbow = y;        // green goes from off to on
-             bluerainbow = 0;         // blue is always off
-             }
-       else if (y <= 511){     // zone 2
-             redrainbow = 0;                 // red is always off
-             greenrainbow = 255 - (y - 256); // green on to off
-             bluerainbow = (y - 256);        // blue off to on
-             }
-       else{ // color >= 512       // zone 3
-             redrainbow = (y - 512);         // red off to on
-             greenrainbow = 0;               // green is always off
-             bluerainbow = 255 - (y - 512);  // blue on to off
-             }
-             
-       /////////////////////////////////////////////////
-       // Now that the Intensity values have been set,//
-       // activate the LED with those values          //
-       /////////////////////////////////////////////////
-       
-            analogWrite(RedPIN, redrainbow);
-            analogWrite(BluePIN, bluerainbow);
-            analogWrite(GreenPIN, greenrainbow);
-            delay((blinkdelay[1]/30));                    
-            }
-         }
-         // final off after the whole rainbow is done
-          delay(500);
-          redrainbow = 0;    // red off
-          greenrainbow = 0;        // green off
-          bluerainbow = 0;             // blue off
-          analogWrite(RedPIN, redrainbow);
-          analogWrite(BluePIN, bluerainbow);
-          analogWrite(GreenPIN, greenrainbow);
-        }
-        
-if (EFFECT[1]==4){ // if the chosen effect for this led is ice effect
-   for (int a= 0; a< Nofblinks[1]; a++){//repeat the ice effect as per the Nofblinks[1] value
-       if (Serial.available() > 0){ // 
-          analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-          analogWrite(GreenPIN, 0); //
-          analogWrite(BluePIN, 0); //
-          break;
+            // if the effect selected is fading effect
+        if (EFFECT[1]== 2){ 
+           fade1(GreenPIN, Nofblinks[1], blinkdelay[1]); 
           }
-          
-    for (int y=0; y<=240; y++){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-        // fade in till full blue-ice brightness
-        analogWrite(GreenPIN, y); //
-        analogWrite(BluePIN, y); //
-        delay((blinkdelay[1]/20));  
-        }
-    for (int x=0; x<=255; x++){
-        if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, x); //mix red proportionally to reach white colour
-         analogWrite(GreenPIN, 255); //
-         analogWrite(BluePIN, 255); //
-         delay ((blinkdelay[1]/20));
-         }
-    for (int z=255; z>=0; z--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-      
-         analogWrite(RedPIN, z); // reverse the action to fade out
-         analogWrite(GreenPIN, 255); //
-         analogWrite(BluePIN, 255); //
-         delay ((blinkdelay[1]/20));
-         }
-    for (int w=255; w>=0; w--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, 0); // fade out blue ice till all off
-         analogWrite(GreenPIN, w); //
-         analogWrite(BluePIN, w); //
-         delay((blinkdelay[1]/20));  
-         }
      }
-     analogWrite(RedPIN, 0); // turn off the led
-     analogWrite(GreenPIN, 0); // just to make sure it is off
-     analogWrite(BluePIN, 0); //
-  }
-        
-if (EFFECT[1]==5){ // if the chosen effect for this led is fire effect
-  for (int a= 0; a< Nofblinks[1]; a++){ //repeat the rainbow effect as per the Nofblinks[1] value
-     for (int y=0; y<=255; y++){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-        analogWrite(RedPIN, y);// fade in till full red brightness
-        delay((blinkdelay[1]/20));  
-        }
-    for (int x=0; x<=40; x++){
-        if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, 255); //mix green proportionally to the red in order to 
-         analogWrite(GreenPIN, x); // blend the colours
-         delay ((blinkdelay[1]/20));
-         }
-    for (int z=40; z>=0; z--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-      
-         analogWrite(RedPIN, 255); // reverse the action to fade out
-         analogWrite(GreenPIN, z); //
-         delay ((blinkdelay[1]/20));
-         }
-    for (int w=255; w>=0; w--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, w); // fade out red till off
-         delay((blinkdelay[1]/20));  
-         }
-     }
-     analogWrite(RedPIN, 0); // turn off the led
-     analogWrite(GreenPIN, 0); //
-  }
-      
+      // if ledmode is set to 1 RGB led
+   if(ledmode[0]==2){ 
+           // if the effect selected is normal blinking
+       if (EFFECT[1]== 1){ 
+           blink2(Nofblinks[1], blinkdelay[1], BRIGHTF[0], BRIGHTF[1], BRIGHTF[2]);
+          }
+           // if the effect selected is fading effect
+       if (EFFECT[1]== 2){ 
+          unsigned int P = (blinkdelay[1]*10);
+          double O = 2*PI/P; 
+          fade2(P, O, Nofblinks[1], BRIGHTF[0], BRIGHTF[1], BRIGHTF[2]);             
+          }
+           // if the effect selected is rainbow effect
+       if (EFFECT[1]== 3){ 
+          rainbow(Nofblinks[1], blinkdelay[1]);
+          }
+           // if the effect selected is ice effect
+       if (EFFECT[1]==4){ 
+          ice(Nofblinks[1], blinkdelay[1]);
+          }
+           // if the effect selected is fire effect
+       if (EFFECT[1]==5){ 
+          fire(Nofblinks[1], blinkdelay[1]);
+         }  
   }
  Serial.println("you got a new follower ");
  Serial.println(" "); 
 }
      
   
-
-if (data[0] == 'p') { //if Arduino detects the trigger command p from serial (new post) 
-    if(ledmode[0]==1){    //and if ledmode[0] is set to 1 (3x single colour led mode)
-      if (EFFECT[2]== 1){ // if the effect selected is normal blinking
-         for (int a= 0; a< Nofblinks[2]; a++){ //repeat the blinking effect as per the Nofblinks[2] value
-            if (Serial.available() > 0){ // 
-                 analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-                 analogWrite(GreenPIN, 0); //
-                 analogWrite(BluePIN, 0); //
-                 break;
-                 }  
-              // do the blinking
-            analogWrite(BluePIN, 255); //turn on the led to full birghtness
-            delay(blinkdelay[2]);
-            analogWrite(BluePIN, 0);//turn off the led
-            delay(blinkdelay[2]);
+   //if Arduino receives the command p from serial (new post) 
+if (data[0] == 'p') { 
+       // if ledmode is set to 3x single led mode
+    if(ledmode[0]==1){  
+             // if the effect selected is normal blinking  
+         if (EFFECT[2]== 1){ 
+            blink1(BluePIN, Nofblinks[2], blinkdelay[2]);
             }
-         }
-         
-     if (EFFECT[2]== 2){ // if the effect selected is fading effect
-        for (int a= 0; a< Nofblinks[2]; a++){ //repeat the fading effect as per the Nofblinks[2] value
+             // if the effect selected is fading effect
+         if (EFFECT[2]== 2){ 
+            fade1(BluePIN, Nofblinks[2], blinkdelay[2]);  
+            }
+        }
+       //if ledmode is set to RGB led mode 
+    if(ledmode[0]==2){
+             // if the effect selected is normal blinking
+         if (EFFECT[2]== 1){ 
+             blink2(Nofblinks[2], blinkdelay[2], BRIGHTP[0], BRIGHTP[1], BRIGHTP[2]);
+            }
+             // if the effect selected is fading effect
+         if (EFFECT[2]== 2){ 
+             unsigned int P = (blinkdelay[2]*10);
+             double O = 2*PI/P; 
+             fade2(P, O, Nofblinks[2], BRIGHTP[0], BRIGHTP[1], BRIGHTP[2]);                 
+            }
+             // if the effect selected is rainbow effect
+         if (EFFECT[2]== 3){ 
+             rainbow( Nofblinks[2], blinkdelay[2]);
+            }
+             // if the effect selected is ice effect
+         if (EFFECT[2]==4){ 
+            ice(Nofblinks[2], blinkdelay[2]);
+           }
+           // if the effect selected is fire effect
+        if (EFFECT[2]==5){ 
+            fire(Nofblinks[2], blinkdelay[2]);
+           }
+           
+      Serial.println("there is a new post ");
+      Serial.println(" "); 
+     } 
+  }
+}
+
+void blink1(int Pin, int Nblink, int LEDdelay ){
+
+
+    for (int a= 0; a< Nblink; a++){ //repeat the blinking effect as per the Nofblinks[0] value
+                if (Serial.available() > 0){ // 
+                    analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
+                    analogWrite(GreenPIN, 0); //
+                    analogWrite(BluePIN, 0); //
+                    break;
+                    }
+                    
+              //do the blinking  
+                 analogWrite(Pin, 255); //turn on the led 
+                 delay(LEDdelay);
+                 analogWrite(Pin, 0);//turn off the led
+                 delay(LEDdelay);
+             }
+}
+
+void fade1(int Pin, int Nblink, int LEDdelay ){
+
+
+    for (int a= 0; a< Nblink; a++){ //repeat the fading effect as per the Nofblinks[2] value
            for (int f=0; f<=255; f++){
               if (Serial.available() > 0){ // 
                  analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
@@ -1093,43 +635,46 @@ if (data[0] == 'p') { //if Arduino detects the trigger command p from serial (ne
                  analogWrite(BluePIN, 0); //
                  break;
                  }        
-                analogWrite(BluePIN, f); //fade in the led
-                delay((blinkdelay[2]/20));
+                 
+              //do the fading
+                analogWrite(Pin, f);  //fade in the led
+                delay((LEDdelay/20));
                 }
            for (int f=255; f>=0; f--){
-                analogWrite(BluePIN, f);//fade out the led
-                delay((blinkdelay[2]/20));
+                analogWrite(Pin, f);  //fade out the led
+                delay((LEDdelay/20));
                 } 
           }
-       }
-    }
-if(ledmode[0]==2){ //if ledmode[0] is set to 2 (1x RGB led mode)
-    if (EFFECT[2]== 1){ // if the effect selected is normal blinking
-        for (int a= 0; a< Nofblinks[2]; a++){ //repeat the blinking effect as per the Nofblinks[2] value
-             if (Serial.available() > 0){ // 
+}
+
+void blink2(int Nblink, int LEDdelay, int R, int G, int B ){
+
+    for (int a= 0; a< Nblink; a++){ //repeat the fading effect as per the Nofblinks[2] value
+          if (Serial.available() > 0){ // 
                  analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
                  analogWrite(GreenPIN, 0); //
                  analogWrite(BluePIN, 0); //
                  break;
                  }
-           //do the blinking  
-           analogWrite(RedPIN, BRIGHTP[0]);
-           analogWrite(GreenPIN, BRIGHTP[1]); //turn on the led using the stored R G B values
-           analogWrite(BluePIN, BRIGHTP[2]);
-           delay(blinkdelay[2]);
+                 
+          //do the blinking  
+           analogWrite(RedPIN, R);
+           analogWrite(GreenPIN, G); //turn on the led using the stored R G B values
+           analogWrite(BluePIN, B);
+           delay(LEDdelay);
            analogWrite(RedPIN, 0);
            analogWrite(GreenPIN, 0);//turn of the led
            analogWrite(BluePIN, 0);
-           delay(blinkdelay[2]);
-          }
-       }
-if (EFFECT[2]== 2){ // if the effect selected is fading effect
-       unsigned int PERIOD = (blinkdelay[2]*10);
-       double OMEGA = 2*PI/PERIOD; //use a double variable since OMEGA can contain decimals
+           delay(LEDdelay);
+      }
+}
+
+void fade2(unsigned int PERIOD, double OMEGA, int Nblink, int R, int G, int B ){
+           
        int count=1;// variable to count the number of oscillations
        StartTime= millis();
      
-      while (count <= Nofblinks[2]){ //loop to be used to repeat the pattern as per Nofblinks[2] value
+      while (count <= Nblink){ //loop to be used to repeat the pattern as per Nofblinks[1] value
                if (Serial.available() > 0){ /////////////////////////////////////// 
                  analogWrite(RedPIN, 0);    //turn off the led when any new data //
                  analogWrite(GreenPIN, 0);  //  is received and exit the loop    //
@@ -1143,11 +688,11 @@ if (EFFECT[2]== 2){ // if the effect selected is fading effect
                // sine wave from 0% brightness to 100% brightness //
                /////////////////////////////////////////////////////
 
-               int FadeRed= ((BRIGHTP[0]/2) + (BRIGHTP[0]/2)*(cos(OMEGA*CurrentTime)));    ///////////////////////////////////////////////
-               int FadeGreen= ((BRIGHTP[1]/2) + (BRIGHTP[1]/2)*(cos(OMEGA*CurrentTime)));  // let the value of the brightness oscillate //
-               int FadeBlue= ((BRIGHTP[2]/2) + (BRIGHTP[2]/2)*(cos(OMEGA*CurrentTime)));   // between 0% and 100% of the set RGB colour //
-                                                                                           //     with the variation of a sine wave     //
-                                                                                           ///////////////////////////////////////////////
+               int FadeRed= ((R/2) + (R/2)*(cos(OMEGA*CurrentTime)));    ///////////////////////////////////////////////
+               int FadeGreen= ((G/2) + (G/2)*(cos(OMEGA*CurrentTime)));  // let the value of the brightness oscillate //
+               int FadeBlue= ((B/2) + (B/2)*(cos(OMEGA*CurrentTime)));   // between 0% and 100% of the set RGB colour //
+                                                                         //     with the variation of a sine wave     //
+                                                                         ///////////////////////////////////////////////
 
                if ((unsigned long)(millis() - StartTime) >= PERIOD){ ///////////////////////////////////////////////////////////////////////////
                 count++;                                             // every full oscillation increase the counter and take the current time //
@@ -1159,24 +704,26 @@ if (EFFECT[2]== 2){ // if the effect selected is fading effect
                 analogWrite(BluePIN, FadeBlue);
                 
 
-               if (count == Nofblinks[2] ){
+               if (count == Nblink ){
                 analogWrite(RedPIN, 0);
                 analogWrite(GreenPIN, 0);// turn off the led
                 analogWrite(BluePIN, 0);
                 break;
                 }
-          }              
-    }
-      
-if (EFFECT[2]== 3){ // if the chosen effect for this led is rainbow effect
+          }
+}
+
+void rainbow(int Nblink, int LEDdelay){
+           
          int redrainbow;
          int greenrainbow;
          int bluerainbow;
-   for (int a= 0; a< Nofblinks[2]; a++){  //repeat the rainbow effect as per the Nofblinks[2] value
+         
+   for (int a= 0; a< Nblink; a++){  //repeat the rainbow effect as per the Nofblinks[0] value
       for (int y = 0; y < 768; y++){
         
         if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
+           analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
            analogWrite(GreenPIN, 0); //
            analogWrite(BluePIN, 0); //
             break;
@@ -1196,19 +743,23 @@ if (EFFECT[2]== 3){ // if the chosen effect for this led is rainbow effect
              greenrainbow = 0;               // green is always off
              bluerainbow = 255 - (y - 512);  // blue on to off
              }
+             
        /////////////////////////////////////////////////
-       // Now that the Intensity values have been set,// 
+       // Now that the Intensity values have been set,//
        // activate the LED with those values          //
        /////////////////////////////////////////////////
+       
             analogWrite(RedPIN, redrainbow);
             analogWrite(BluePIN, bluerainbow);
             analogWrite(GreenPIN, greenrainbow);
-            delay((blinkdelay[2]/30));                    
+            delay((LEDdelay/30));                    
             }
          }
+         
          //////////////////////////////////////////////
          // final off after the whole rainbow is done//
          //////////////////////////////////////////////
+         
           delay(500);
           redrainbow = 0;    // red off
           greenrainbow = 0;        // green off
@@ -1216,133 +767,114 @@ if (EFFECT[2]== 3){ // if the chosen effect for this led is rainbow effect
           analogWrite(RedPIN, redrainbow);
           analogWrite(BluePIN, bluerainbow);
           analogWrite(GreenPIN, greenrainbow);
-      }
-      
-if (EFFECT[2]==4){ // if the chosen effect for this led is ice effect
-   for (int a= 0; a< Nofblinks[2]; a++){//repeat the ice effect as per the Nofblinks[2] value
-       if (Serial.available() > 0){ // 
-          analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-          analogWrite(GreenPIN, 0); //
-          analogWrite(BluePIN, 0); //
-          break;
+}
+
+void ice(int Nblink, int LEDdelay){
+  
+        //repeat the ice effect as per Nblink value
+   for (int a= 0; a< Nblink; a++){
+       if (Serial.available() > 0){   //////////////////////////
+          analogWrite(RedPIN, 0);     //   turn off the led   //
+          analogWrite(GreenPIN, 0);   //when data is received // 
+          analogWrite(BluePIN, 0);    //  and exit the loop   //
+          break;                      //////////////////////////
           }
           
-    for (int y=0; y<=240; y++){
+        //loop for fade in effect  
+    for (int y=0; y<=510; y++){
        if (Serial.available() > 0){ // 
            analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
            analogWrite(GreenPIN, 0); //
            analogWrite(BluePIN, 0); //
             break;
             }
-        // fade in till full blue-ice brightness
-        analogWrite(GreenPIN, y); //
-        analogWrite(BluePIN, y); //
-        delay((blinkdelay[2]/20));  
-        }
-    for (int x=0; x<=255; x++){
-        if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, x); //mix red proportionally to reach white colour
-         analogWrite(GreenPIN, 255); //
-         analogWrite(BluePIN, 255); //
-         delay ((blinkdelay[2]/20));
-         }
-    for (int z=255; z>=0; z--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-      
-         analogWrite(RedPIN, z); // reverse the action to fade out
-         analogWrite(GreenPIN, 255); //
-         analogWrite(BluePIN, 255); //
-         delay ((blinkdelay[2]/20));
-         }
-    for (int w=255; w>=0; w--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, 0); // fade out blue ice till all off
-         analogWrite(GreenPIN, w); //
-         analogWrite(BluePIN, w); //
-         delay((blinkdelay[2]/20));  
-         }
+            
+           // fade in to blue-ice colour
+        if(y<=255){
+           analogWrite(RedPIN, 0); 
+           analogWrite(GreenPIN, y); //
+           analogWrite(BluePIN, y); //
+          }
+           //fade to white colour
+        if(y>255){
+           analogWrite(RedPIN, (y-255)); 
+           analogWrite(GreenPIN, 255); //
+           analogWrite(BluePIN, 255); //
+          } 
+         delay ((LEDdelay/20));
+         
      }
+    for (int x=510; x>=0; x--){
+       if (Serial.available() > 0){ // 
+           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
+           analogWrite(GreenPIN, 0); //
+           analogWrite(BluePIN, 0); //
+            break;
+            }
+            
+           //fade to blue-ice colour
+        if(x>255){
+           analogWrite(RedPIN, (x-255)); 
+           analogWrite(GreenPIN, 255); //
+           analogWrite(BluePIN, 255); //
+          }    
+           // fade out to off
+        if(x<=255){
+           analogWrite(RedPIN, 0);
+           analogWrite(GreenPIN, x); //
+           analogWrite(BluePIN, x); //
+          }  
+         delay ((LEDdelay/20));
+                
+     }
+ }
      analogWrite(RedPIN, 0); // turn off the led
      analogWrite(GreenPIN, 0); // just to make sure it is off
      analogWrite(BluePIN, 0); //
-  }
-      
-if (EFFECT[2]==5){ // if the chosen effect for this led is fire effect
-  for (int a= 0; a< Nofblinks[2]; a++){ //repeat the rainbow effect as per the Nofblinks[2] value
-     if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }//repeat the fire effect as per the Nofblinks[2] value
-    for (int y=0; y<=255; y++){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-        analogWrite(RedPIN, y);// fade in till full red brightness
-        delay((blinkdelay[2]/20));  
-        }
-    for (int x=0; x<=40; x++){
-        if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, 255); //mix green proportionally to the red in order to 
-         analogWrite(GreenPIN, x); // blend the colours
-         delay ((blinkdelay[2]/20));
-         }
-    for (int z=40; z>=0; z--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-      
-         analogWrite(RedPIN, 255); // reverse the action to fade out
-         analogWrite(GreenPIN, z); //
-         delay ((blinkdelay[2]/20));
-         }
-    for (int w=255; w>=0; w--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-         analogWrite(RedPIN, w); // fade out red till off
-         delay((blinkdelay[2]/20));  
-         }
-      
-     }
-     analogWrite(RedPIN, 0); // turn off the led
-     analogWrite(GreenPIN, 0); //
-  }
-     
-      Serial.println("there is a new post ");
-      Serial.println(" "); 
-     }     
-   }
 }
+
+void fire(int Nblink, int LEDdelay){
+  
+ for (int a= 0; a< Nblink; a++){ //repeat the rainbow effect as per the Nofblinks[1] value
+     for (int y=0; y<=295; y++){
+           if (Serial.available() > 0){ // 
+                 analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
+                 analogWrite(GreenPIN, 0); //
+                 analogWrite(BluePIN, 0); //
+                 break;
+               }
+          // fade in till full red brightness
+       if(y<=255){
+          analogWrite(RedPIN, y);
+         }
+          // fade to orange-yellow
+       if(y>=255){
+          analogWrite(GreenPIN, (y-255));
+         }
+          delay ((LEDdelay/20));  
+    }
+
+    for (int x=295; x>=0; x--){
+           if (Serial.available() > 0){ // 
+                 analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
+                 analogWrite(GreenPIN, 0); //
+                 analogWrite(BluePIN, 0); //
+                 break;
+               }
+          // fade back to red
+       if(x>=255){
+          analogWrite(GreenPIN, (x-255));
+         }
+          // fade till off
+       if(x<=255){
+          analogWrite(RedPIN, x);
+         }     
+      delay ((LEDdelay/20));  
+    }
+ }
+     analogWrite(RedPIN, 0); // turn off the led
+     analogWrite(GreenPIN, 0); // (just to make sure)
+}
+
 
 
