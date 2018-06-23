@@ -45,7 +45,7 @@
 
  	:: USB stick
 IF "%utopiandevice%"=="usbstick" (
-    start "" "bat\blink.bat"
+    call blink.bat
 )
 
 
@@ -127,7 +127,7 @@ IF "%utopiandevice%"=="arduino" (
   
  	:: USB stick
 IF "%utopiandevice%"=="usbstick" (
-    start "" "bat\blink.bat"
+    call blink.bat
 )
 
 

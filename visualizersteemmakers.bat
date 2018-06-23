@@ -40,12 +40,9 @@
  
  
 
- 
- 
-
  	:: USB stick
 IF "%steemmakersdevice%"=="usbstick" (
-    start "" "bat\blink.bat"
+     call blink.bat
 )
 
 
@@ -127,7 +124,7 @@ IF "%steemmakersdevice%"=="arduino" (
   
  	:: USB stick
 IF "%steemmakersdevice%"=="usbstick" (
-    start "" "bat\blink.bat"
+     call blink.bat
 )
 
 
