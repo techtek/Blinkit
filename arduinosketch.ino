@@ -1,32 +1,102 @@
-char buffer[22];
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-int RedPIN = 3; //pin for led 1 (single colour led) or pin for the Red led in the RGB led
-int GreenPIN = 5; //pin for led 2 (single colour led) or pin for the Green led in the RGB led
-int BluePIN = 6 ; //pin for led 3 (single colour led) or pin for the Blue led in the RGB led
+#define OLED_RESET 4
+Adafruit_SSD1306 display(OLED_RESET);
+
+#define LCD_HEIGHT 64
+
+char buffer[17];
+
+#define RedPIN  3 //pin for led 1 (single colour led) or pin for the Red led in the RGB led
+#define GreenPIN  5 //pin for led 2 (single colour led) or pin for the Green led in the RGB led
+#define BluePIN 6  //pin for led 3 (single colour led) or pin for the Blue led in the RGB led
 //above pins must be DIGITAL PWM PINS (in Arduino Uno, PIN 3, 5, 6, 9, 10, 11 are PWM) in order to obtain the colours shades with the RGB led
-int y=0;
-int transferdata[3]; //array to be used to store the incoming settings and transfer them to the right setting array
-int ledmode[2]; //this array will store the information regarding the ledmode (mode 1 for 3x single colour leds and mode 2 for 1x RGB led )
-int blinkdelay[3]; //this array will store the information to be used for the blink speed (in this case it is a delay between blinks)
-int Nofblinks[3]; //this array will store the information to be used for the number of triggers/blinks to do (number of repeated triggers)
-int BRIGHTU[3]; // This array will store the information regarding the colour of the RGB led for an incoming upvote trigger (3 values for the colour)
-int BRIGHTF[3];// This array will store the information regarding the colour of the RGB led for an incoming follower trigger (3 values for the colour)
-int BRIGHTP[3]; // This array will store the information regarding the colour of the RGB led for an incoming post trigger (3 values for the colour)
-int EFFECT[3]; // This array will store the information regarding the effect chosen for each led/notification (1 for normal Blink, 2 for Fading, 3 for rainbow, 4 for ice, 5 for fire)
+ byte y=0;
+ byte transferdata[3]; //array to be used to store the incoming settings and transfer them to the right setting array
+ byte ledmode[1]; //this array will store the information regarding the ledmode (mode 1 for 3x single colour leds and mode 2 for 1x RGB led )
+ byte blinkdelay[3]; //this array will store the information to be used for the blink speed (in this case it is a delay between blinks)
+ byte Nofblinks[3]; //this array will store the information to be used for the number of triggers/blinks to do (number of repeated triggers)
+ byte BRIGHTU[3]; // This array will store the information regarding the colour of the RGB led for an incoming upvote trigger (3 values for the colour)
+ byte BRIGHTF[3];// This array will store the information regarding the colour of the RGB led for an incoming follower trigger (3 values for the colour)
+ byte BRIGHTP[3]; // This array will store the information regarding the colour of the RGB led for an incoming post trigger (3 values for the colour)
+ byte EFFECT[3]; // This array will store the information regarding the effect chosen for each led/notification (1 for normal Blink, 2 for Fading, 3 for rainbow, 4 for ice, 5 for fire)
 unsigned long StartTime; //will be used to calculate timing for fading effect
 unsigned long CurrentTime; //will be used to calculate timing for fading effect
+
+// 'Angler fish logo oriented to right', 64x32px
+const unsigned char ANGLER_TO_RIGHT [] PROGMEM = {
+0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0xf8, 0x00, 
+  0x00, 0x00, 0x00, 0x00, 0x80, 0x06, 0x04, 0x00, 0x00, 0x00, 0x00, 0x07, 0xe0, 0x0c, 0x02, 0x00, 
+  0x00, 0x00, 0x00, 0x0f, 0xe0, 0x08, 0x02, 0x00, 0x00, 0x00, 0x00, 0x1f, 0xe0, 0x18, 0x01, 0x00, 
+  0x00, 0x00, 0x00, 0x7f, 0xe0, 0x10, 0x01, 0x00, 0x00, 0x00, 0x01, 0xff, 0xfe, 0x10, 0x01, 0x00, 
+  0x00, 0x00, 0x03, 0xff, 0xff, 0x10, 0x01, 0x80, 0x03, 0x80, 0x07, 0xff, 0xff, 0xf0, 0x01, 0x80, 
+  0x03, 0xe0, 0x07, 0xff, 0xff, 0xf0, 0x01, 0x80, 0x01, 0xf8, 0x07, 0xff, 0xff, 0xf8, 0x01, 0xc0, 
+  0x01, 0xfe, 0x03, 0xff, 0xff, 0xfc, 0x01, 0xc0, 0x00, 0xff, 0x8f, 0xff, 0xff, 0xfe, 0x01, 0xc0, 
+  0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 
+  0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xfe, 0x00, 0x00, 
+  0x00, 0xff, 0x9f, 0xff, 0xff, 0xfc, 0x00, 0x00, 0x00, 0xfc, 0x03, 0xff, 0xff, 0xf8, 0x00, 0x00, 
+  0x00, 0xf8, 0x0f, 0xff, 0xff, 0xd0, 0x00, 0x00, 0x00, 0xe0, 0x0f, 0xff, 0xff, 0xe0, 0x00, 0x00, 
+  0x00, 0x00, 0x07, 0xff, 0xff, 0xc0, 0x30, 0x00, 0x00, 0x00, 0x07, 0xff, 0xff, 0xf5, 0x70, 0x00, 
+  0x00, 0x00, 0x07, 0xbf, 0xff, 0xf7, 0xf8, 0x00, 0x00, 0x00, 0x02, 0x1f, 0xff, 0xff, 0xf8, 0x00, 
+  0x00, 0x00, 0x00, 0x0f, 0xff, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x07, 0xff, 0xff, 0xe0, 0x00, 
+  0x00, 0x00, 0x00, 0x03, 0xff, 0xff, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0x00, 0x00, 
+  0x00, 0x00, 0x00, 0x00, 0xff, 0xfc, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0x00, 0x00, 0x00
+};
+
+// 'Angler fish logo oriented to left', 64x32px
+const unsigned char ANGLER_TO_LEFT [] PROGMEM = {
+ 0x00, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 
+ 0x00, 0x20, 0x60, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x30, 0x07, 0xe0, 0x00, 0x00, 0x00, 
+  0x00, 0x40, 0x10, 0x07, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x80, 0x18, 0x07, 0xf8, 0x00, 0x00, 0x00, 
+  0x00, 0x80, 0x08, 0x07, 0xfe, 0x00, 0x00, 0x00, 0x00, 0x80, 0x08, 0x7f, 0xff, 0x80, 0x00, 0x00, 
+  0x01, 0x80, 0x08, 0xff, 0xff, 0xc0, 0x00, 0x00, 0x01, 0x80, 0x0f, 0xff, 0xff, 0xe0, 0x01, 0xc0, 
+  0x01, 0x80, 0x0f, 0xff, 0xff, 0xe0, 0x07, 0xc0, 0x03, 0x80, 0x1f, 0xff, 0xff, 0xe0, 0x1f, 0x80, 
+  0x03, 0x80, 0x3f, 0xff, 0xff, 0xc0, 0x7f, 0x80, 0x03, 0x80, 0x7f, 0xff, 0xff, 0xf1, 0xff, 0x00, 
+  0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 
+  0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x7f, 0xff, 0xff, 0xff, 0xff, 0x00, 
+  0x00, 0x00, 0x3f, 0xff, 0xff, 0xf9, 0xff, 0x00, 0x00, 0x00, 0x1f, 0xff, 0xff, 0xc0, 0x3f, 0x00, 
+  0x00, 0x00, 0x0b, 0xff, 0xff, 0xf0, 0x1f, 0x00, 0x00, 0x00, 0x07, 0xff, 0xff, 0xf0, 0x07, 0x00, 
+  0x00, 0x0c, 0x03, 0xff, 0xff, 0xe0, 0x00, 0x00, 0x00, 0x0e, 0xaf, 0xff, 0xff, 0xe0, 0x00, 0x00, 
+  0x00, 0x1f, 0xef, 0xff, 0xfd, 0xe0, 0x00, 0x00, 0x00, 0x1f, 0xff, 0xff, 0xf8, 0x40, 0x00, 0x00, 
+  0x00, 0x0f, 0xff, 0xff, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x07, 0xff, 0xff, 0xe0, 0x00, 0x00, 0x00, 
+  0x00, 0x03, 0xff, 0xff, 0xc0, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x80, 0x00, 0x00, 0x00, 
+  0x00, 0x00, 0x3f, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf8, 0x00, 0x00, 0x00, 0x00
+};
 
 void setup(){
     Serial.begin(9600);//initialize serial comunication
     Serial.flush();    
-      pinMode(RedPIN, OUTPUT); 
-      pinMode(GreenPIN, OUTPUT);//set the selected pins as output 
-      pinMode(BluePIN, OUTPUT); 
+        pinMode(RedPIN, OUTPUT); 
+        pinMode(GreenPIN, OUTPUT);//set the selected pins as output 
+        pinMode(BluePIN, OUTPUT); 
+      
+   ////////////////////////////////////////////////////////////
+   //   initialize with the I2C addr 0x3C (for the 128x64)   //
+   //    check your display address and modify accordingly   //
+   ////////////////////////////////////////////////////////////  
+   
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);  
+  // init done
+  // Show image buffer on the display hardware.
+  // Since the buffer has been intialized with an the Blinkit logo splashscreen
+  // internally, this will display the splashscreen.
+  display.display();
+  delay(2000);
+
+  // Clear the buffer.
+  display.clearDisplay();
 }
  
 void loop(){ //collecting the incoming data and filling the buffer with it
-  StartTime = millis(); // updating time
+       StartTime = millis(); // updating time
   if (Serial.available() > 0) { //if there is any incoming serial data of any sort (any setting or any notification)
+       display.setTextSize(2);
+       display.setTextColor(WHITE);
+       display.setCursor(25,20);
+       display.println(F("INCOMING    DATA")); //advise on display that new data is incoming
+       display.display();
        int index=0;
        delay(100); // let the buffer fill up
        int numChar = Serial.available(); 
@@ -39,171 +109,280 @@ void loop(){ //collecting the incoming data and filling the buffer with it
         splitString(buffer);
    }
  if (Serial.available() == NULL){    //
-   for (int r=1; r<=3; r++){          // if within 3 seconds  
+    for (int r=1; r<=10; r++){          // if within 10 seconds  
       if (Serial.available() == NULL){  // no serial data is detected
         delay (1000);                    //(thus no settings or no notification) -> activate the function breath
-       }
+        }
       else{ // if serial data is detected then stop the process
         break;
-        }}
+        }
+        }
         
-     breath(); // activate the function called breath (standby fading light pattern)
+     standby(); // activate the function called standby (standby fading light pattern and display slide)
+     
      }
 }
 
-void breath(){
+void standby(){ 
+  display.stopscroll(); //stop any previous scroll (just to make sure)
+  display.clearDisplay();// clear the display
+  
    int redIntensity = 0;   //variable to handle the brightness of the RED colour of the RGB led
    int blueIntensity = 0;  //variable to handle the brightness of the BLUE colour of the RGB led
    int greenIntensity = 0; //variable to handle the brightness of the GREEN colour of the RGB led
 
 while (Serial.available() == NULL){ //run below fading pattern till some data is detected over serial
- 
- for (int i = 0; i <=255; i+=1){ //This loop will light up/dim linearly the led till it goes from off state to a value close to
-                                 //R=110 G=0 B=255 the starting value for our fading pattern
-
-    if (Serial.available() > 0){ // 
-      analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
+               
+ for (int i = 0; i <=64; i+=1){ //This loop will light up/dim linearly the led till it goes from off state to a value close to
+                                 //R=128 G=0 B=255 the starting value for our fading pattern
+   if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
       analogWrite(GreenPIN, 0); //
       analogWrite(BluePIN, 0); //
-      break;
+      display.clearDisplay(); // clear display 
+      break; //and exit the loop
       }
       
-   redIntensity = i/2;
-   blueIntensity = i ;
- 
+      redIntensity = 2*i;
+      blueIntensity = 4*i ;
+
+      if(blueIntensity>=255){
+        blueIntensity=255;
+      }
+
+      
+       
       analogWrite(RedPIN, redIntensity);     //
       analogWrite(GreenPIN, greenIntensity);  //activate with proper delay the led using the currently stored values for R G B
-      analogWrite(BluePIN, blueIntensity);   //
-      delay(10);    
-      }
+      analogWrite(BluePIN, blueIntensity);   //      
 
- for (int t = 0; t<1; t++){  //this FOR loop will let use repeat the below (whole) fade-in, fade-out pattern twice
-  
-   if (Serial.available() > 0){ // 
-      analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-      analogWrite(GreenPIN, 0); //
-      analogWrite(BluePIN, 0); //
-      break;
-      }
+      //////////////////////////////////////////////////
+      //   slide the Blinkit text on the display      //
+      //////////////////////////////////////////////////
       
- for (int i = 127; i <=465; i+=1){    
+       int PERIOD= 4000;
+       double OMEGA= 2*PI/PERIOD;
+       CurrentTime= millis();
+       int y=((LCD_HEIGHT/3)+(LCD_HEIGHT/3)*(cos(OMEGA*CurrentTime))); //use the COS function to let the text oscillate up and down following the sine wave
+       display.setTextSize(2); //set text size
+       display.setTextColor(WHITE);//set colour of text
+       display.setCursor(25,y); //set where to write the text
+       display.println(F("BLINKiT"));// display the text
+       display.display();
+       display.clearDisplay();//clear display
+      
+   }
+      
+ for (int i =0; i <=128; i+=1){    
    
-   if (Serial.available() > 0){ // 
-      analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
+  if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
       analogWrite(GreenPIN, 0); //
       analogWrite(BluePIN, 0); //
-      break;
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
       }
 
-      /////////////////////////////////////////////////////////////////////////////////////////////
-      //     first transition from R=110 G=0 B=255 (darker Violet) to R=255 G=10 B=255           //
-      //   (much brighter Violet) and have chosen to use the redIntensity as the variable        //
-      //part of the FOR loop based on the value of R = i we will calculate the Green brightness. //
-      /////////////////////////////////////////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////////////////////////////////////////
+      //     first transition from R=128 G=0 B=255 (darker Violet) to R=255 G=10 B=255             //
+      //(much brighter Violet) and have chosen to use the redIntensity as the variable part of the //    
+      // FOR loop based on the value of R = i+ (shifting) we will calculate the Green brightness.  //
+      ///////////////////////////////////////////////////////////////////////////////////////////////
       
- if(i<=255){
-       redIntensity = i;
-       greenIntensity = ((118937/10000)*log(i)-(559050/10000)); //The neperien logarithmic function usually wrote as ln(x) 
-                                                             //is not recognized in Arduino coding by using ln but log 
+    
+       redIntensity = i+127;
+       greenIntensity = ((118937/10000)*log(i+127)-(559050/10000)); //The neperien logarithmic function usually wrote as ln(x) 
+                                                              //is not recognized in Arduino coding by using ln but log 
     if(greenIntensity> 10){ //based on the aproximation in calculations we do this just in case not to pass the value
         greenIntensity =10;
       }
-    if(greenIntensity< 1){ //based on the aproximation in the calculations this serves to not let
+    if(greenIntensity< 2){ //based on the aproximation in the calculations this serves to not let
         greenIntensity =0;   //the Green pin turns negative 
       }
-  }
   
+
+    analogWrite(RedPIN, redIntensity);     //
+    analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
+    analogWrite(BluePIN, blueIntensity);   //     
+
+       unsigned int PERIOD= 4000;
+       double OMEGA= 2*PI/PERIOD;
+       CurrentTime= millis();
+       int y=((LCD_HEIGHT/3)+(LCD_HEIGHT/3)*(cos(OMEGA*CurrentTime)));  //use the COS function to let the text oscillate up and down following the sine wave
+       int x= i-60;
+       display.drawBitmap(x, y, ANGLER_TO_RIGHT, 64, 32, 1); 
+       display.setTextSize(2); //set text size
+       display.setTextColor(WHITE);//set colour of text
+       display.setCursor(25,y); //set where to write the text
+       display.println(F("BLINKiT")); // display the text
+       display.display();
+       display.clearDisplay(); //clear display                    
+}
 
  ////////////////////////////////////////////////////////////////////
  // linear transition between the bright Violet (R=255 G=10 B=255) //
- //       and the White colour (R=255 G=220 B=255)                 //
+ //       and the White colour (R=255 G=200 B=255)                 //
  ////////////////////////////////////////////////////////////////////
- 
- if(i>255){ 
+  for(int i=5; i<=100; i++){
+
+    if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
+      
      redIntensity=255;
      blueIntensity=255;
-     greenIntensity= i-245;
-    }
+     greenIntensity= 2*i;
+
+     analogWrite(RedPIN, redIntensity);     //
+     analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
+     analogWrite(BluePIN, blueIntensity);   // 
        
-analogWrite(RedPIN, redIntensity);     //
-analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
-analogWrite(BluePIN, blueIntensity);   //
-delay(10);                             //
-}
+       int PERIOD= 4000;
+       double OMEGA= 2*PI/PERIOD;
+       CurrentTime= millis();
+       int y=((LCD_HEIGHT/3)+(LCD_HEIGHT/3)*(cos(OMEGA*CurrentTime))); //use the COS function to let the text oscillate up and down following the sine wave
+       int x= i+63;
+       display.drawBitmap(x, y, ANGLER_TO_RIGHT, 64, 32, 1); //display the logo
+       display.setTextSize(2); //set text size
+       display.setTextColor(WHITE);//set colour of text
+       display.setCursor(25,y); //set where to write the text
+       display.println(F("BLINKiT")); // display the text
+       display.display();
+       display.clearDisplay(); //clear display     
+       
+    }  
+  
+ ///////////////////////////////////////////////////////////////////    
+ //linear transition between the White colour (R=255 G=220 B=255) //
+ //       and the bright Violet (R=255 G=10 B=255)                //
+ ///////////////////////////////////////////////////////////////////
+ 
+    for(int i=100; i>=5; i--){
+
+    if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
+ 
+        redIntensity=255;
+        blueIntensity=255;
+        greenIntensity= 2*i;
+
+     analogWrite(RedPIN, redIntensity);     //
+     analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
+     analogWrite(BluePIN, blueIntensity);   // 
+       
+       int PERIOD= 4000;
+       double OMEGA= 2*PI/PERIOD;
+       CurrentTime= millis();
+       int y=((LCD_HEIGHT/3)+(LCD_HEIGHT/3)*(cos(OMEGA*CurrentTime))); //use the COS function to let the text oscillate up and down following the sine wave
+       int x= i+28;
+       display.drawBitmap(x, y, ANGLER_TO_LEFT, 64, 32, 1);//display the logo
+       display.setTextSize(2); //set text size
+       display.setTextColor(WHITE);//set colour of text
+       display.setCursor(25,y); //set where to write the text
+       display.println(F("BLINKiT")); // display the text
+       display.display();
+       display.clearDisplay(); //clear display     
+       
+    }
 
 ////////////////////////////////////////////////////////////////////////
 // below we reverse the loop used before to fade from Violet to White // 
 //    and use it to do the other way (from White to Violet)           //
 ////////////////////////////////////////////////////////////////////////
 
-for (int i = 465; i >=127; i-=1){
+for (int i = 128; i >=0; i-=1){
                                  
-  if (Serial.available() > 0){ // 
-      analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
+  if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
       analogWrite(GreenPIN, 0); //
       analogWrite(BluePIN, 0); //
-      break;
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
       }
-      
- ///////////////////////////////////////////////////////////////////    
- //linear transition between the White colour (R=255 G=220 B=255) //
- //       and the bright Violet (R=255 G=10 B=255)                //
- ///////////////////////////////////////////////////////////////////
- 
-    if(i>255){ 
-        redIntensity=255;
-        blueIntensity=255;
-        greenIntensity= i-245;
-       }
+     
 
       ///////////////////////////////////////////////////////////////////
-      //       transition from R=255 G=10 B=255 to R=110 G=0 B=255     //
+      //       transition from R=255 G=10 B=255 to R=127 G=0 B=255     //
       ///////////////////////////////////////////////////////////////////
-      
- if(i<=255){
-  
-       redIntensity = i;
-       greenIntensity = ((118937/10000)*log(i)-(559050/10000)); 
-    
-    if(greenIntensity< 2){   //based on the aproximation in the calculations this serves to not let
-        greenIntensity =0;   //the Green pin turns negative and let it go to zero when the loop ends
+
+       redIntensity = i+127;
+       greenIntensity = ((118937/10000)*log(i+127)-(559050/10000)); //The neperien logarithmic function usually wrote as ln(x) 
+                                                                    //is not recognized in Arduino coding by using ln but log 
+    if(greenIntensity>= 10){ //based on the aproximation in calculations we do this just in case not to pass the value
+        greenIntensity =10;
       }
-  }
-    
+    if(greenIntensity< 2){ //based on the aproximation in the calculations this serves to not let
+        greenIntensity =0;   //the Green pin turns negative 
+      }
+
       analogWrite(RedPIN, redIntensity);     //
       analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
-      analogWrite(BluePIN, blueIntensity);   //
-      delay(10);                             //
+      analogWrite(BluePIN, blueIntensity);   // 
+
+       unsigned int PERIOD= 4000;
+       double OMEGA= 2*PI/PERIOD;
+       CurrentTime= millis();
+       int y=((LCD_HEIGHT/3)+(LCD_HEIGHT/3)*(cos(OMEGA*CurrentTime))); //use the COS function to let the text oscillate up and down following the sine wave
+       int x= i-95;
+       display.drawBitmap(x, y, ANGLER_TO_LEFT, 64, 32, 1);//display the logo
+       display.setTextSize(2); //set text size
+       display.setTextColor(WHITE);//set colour of text
+       display.setCursor(25,y); //set where to write the text
+       display.println(F("BLINKiT")); // display the text
+       display.display();
+       display.clearDisplay(); //clear display   
       }
 
-  }
 
 
-for (int i = 255; i >=0; i-=1){ //This loop will dim linearly the led till it goes totally off
-                                //since we went back to R=110 G=0 B=255 with a quick calculation and a good aproximation 
+
+for (int i = 63; i >=0; i-=1){ //This loop will dim linearly the led till it goes totally off
+                                //since we went back to R=127 G=0 B=255 with a quick calculation and a good aproximation 
                                 //we set the step to take for each brightness decrease so that they get dimmed simultaneously and of the same ammount each time
 
-   if (Serial.available() > 0){ // 
-      analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
+if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
       analogWrite(GreenPIN, 0); //
       analogWrite(BluePIN, 0); //
-      break;
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
       }
       
-redIntensity = i/2;
-blueIntensity = i ;
- 
-analogWrite(RedPIN, redIntensity);     //
-analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
-analogWrite(BluePIN, blueIntensity);   //
-delay(10);    
-}
-}
+    redIntensity = i*2;
+    blueIntensity = i*4 ;
+
+
+        analogWrite(RedPIN, redIntensity);     //
+        analogWrite(GreenPIN, greenIntensity); //activate with proper delay the led using the currently stored values for R G B
+        analogWrite(BluePIN, blueIntensity);   //  
+
+     unsigned int PERIOD= 4000;
+       double OMEGA= 2*PI/PERIOD;
+       CurrentTime= millis();
+       int y=((LCD_HEIGHT/3)+(LCD_HEIGHT/3)*(cos(OMEGA*CurrentTime))); //use the COS function to let the text oscillate up and down following the sine wave
+       display.setTextSize(2); //set text size
+       display.setTextColor(WHITE);//set colour of text
+       display.setCursor(25,y); //set where to write the text
+       display.println(F("BLINKiT")); // display the text
+       display.display();
+       display.clearDisplay(); //clear display  
+       }
+   }
 } 
 
 void splitString(char* data) { //splitting the data received based on a fixed separator (in this case the blank space " ")
        Serial.print("Data entered: "); 
        Serial.println(data); // display data entered/received
+       display.clearDisplay();
        char* info;
        info = strtok (data, " "); //using strtok split in tokens the data entered in a sequences of contiguous characters separated by the delimiter " " (empty space)
   while (info != NULL) {
@@ -314,162 +493,162 @@ if (data[0] == 'E') {  //if incoming data has marker "E" store in an array calle
 }
  
 if (data[0] == '?'){   //send command set to view on serial all the current setups
-      Serial.println("Current Settings: ");
-      Serial.println("---------------------------------------------------- ");
-      Serial.println(" ");  
+      Serial.println(F("Current Settings: "));
+      Serial.println(F("---------------------------------------------------- "));
+      Serial.println(F(" "));  
 if(ledmode[0]== 1){     
-        Serial.println("ledmode is set to: 3x single colour LED ");
-        Serial.println(" ");  
+        Serial.println(F("ledmode is set to: 3x single colour LED "));
+        Serial.println(F(" "));  
         
     for (int i=0;i<=2;i++){
-        Serial.print("effect for led ");
+        Serial.print(F("effect for led "));
         Serial.print(i+1);
-        Serial.print(" is set to: ");
+        Serial.print(F(" is set to: "));
       if(EFFECT[i]==1){
-        Serial.println("NORMAL BLINK");
+        Serial.println(F("NORMAL BLINK"));
         }
       if(EFFECT[i]==2){
-        Serial.println("FADING");
+        Serial.println(F("FADING"));
         }
       }
-      Serial.println(" ");
+      Serial.println(F(" "));
     
   for (int i=0;i<=2;i++){
-      Serial.print("Nofblinks for led");
+      Serial.print(F("Nofblinks for led"));
       Serial.print(i+1);
-      Serial.print(" is:");
+      Serial.print(F(" is:"));
       Serial.print(Nofblinks[i]);
-      Serial.println(" Blinks");
+      Serial.println(F(" Blinks"));
     if (i==2){
-      Serial.println(" ");
+      Serial.println(F(" "));
       }
    }     
   for (int i=0;i<=2;i++){
-        Serial.print("blinkdelay for led ");
+        Serial.print(F("blinkdelay for led "));
         Serial.print(i+1);
-        Serial.print(" is:");
+        Serial.print(F(" is:"));
         Serial.print(blinkdelay[i]);
-        Serial.println(" Millis");
+        Serial.println(F(" Millis"));
      if (i==2){
-        Serial.println(" ");
+        Serial.println(F(" "));
         }
    }
 }
    if(ledmode[0]==2){
-              Serial.println("ledmode is set to: 1x RGB LED ");
-              Serial.println(" ");
+              Serial.println(F("ledmode is set to: 1x RGB LED "));
+              Serial.println(F(" "));
                       
-              Serial.print("number of blinks for upvote trigger is: ");
+              Serial.print(F("number of blinks for upvote trigger is: "));
               Serial.print(Nofblinks[0]);
-              Serial.println(" Blinks");
-              Serial.print("number of blinks for follower trigger is: ");
+              Serial.println(F(" Blinks"));
+              Serial.print(F("number of blinks for follower trigger is: "));
               Serial.print(Nofblinks[1]);
-              Serial.println(" Blinks");
-              Serial.print("number of blinks for post trigger is: ");
+              Serial.println(F(" Blinks"));
+              Serial.print(F("number of blinks for post trigger is: "));
               Serial.print(Nofblinks[2]);
-              Serial.println(" Blinks");
-              Serial.println(" ");
+              Serial.println(F(" Blinks"));
+              Serial.println(F(" "));
         
-              Serial.print("blinkdelay for upvote trigger is: ");
+              Serial.print(F("blinkdelay for upvote trigger is: "));
               Serial.print(blinkdelay[0]);
-              Serial.println(" Millis");
-              Serial.print("blinkdelay for follower trigger is: ");
+              Serial.println(F(" Millis"));
+              Serial.print(F("blinkdelay for follower trigger is: "));
               Serial.print(blinkdelay[1]);
-              Serial.println(" Millis");
-              Serial.print("blinkdelay for post trigger is: ");
+              Serial.println(F(" Millis"));
+              Serial.print(F("blinkdelay for post trigger is: "));
               Serial.print(blinkdelay[2]);
-              Serial.println(" Millis");
-              Serial.println(" ");
+              Serial.println(F(" Millis"));
+              Serial.println(F(" "));
               
-              Serial.println("RGB value for upvote trigger is set to");
-              Serial.println(" ");
-              Serial.print("R= ");
+              Serial.println(F("RGB value for upvote trigger is set to"));
+              Serial.println(F(" "));
+              Serial.print(F("R= "));
               Serial.println(BRIGHTU[0]);
-              Serial.print("G= ");
+              Serial.print(F("G= "));
               Serial.println(BRIGHTU[1]);
-              Serial.print("B= ");
+              Serial.print(F("B= "));
               Serial.println(BRIGHTU[2]);
-              Serial.println("");
+              Serial.println(F(""));
              
               if (EFFECT[0]==1){
-                Serial.println("Effect for upvote is: NORMAL BLINKING");
-                Serial.println(" ");
+                Serial.println(F("Effect for upvote is: NORMAL BLINKING"));
+                Serial.println(F(" "));
                  }
               if (EFFECT[0]==2){
-                Serial.println("Effect for upvote is: FADING");
-                Serial.println(" ");
+                Serial.println(F("Effect for upvote is: FADING"));
+                Serial.println(F(" "));
                  }
               if (EFFECT[0]==3){
-                Serial.println("Effect for upvote is: RAINBOW");
-                Serial.println(" ");
+                Serial.println(F("Effect for upvote is: RAINBOW"));
+                Serial.println(F(" "));
               }
               if (EFFECT[0]==4){
-                Serial.println("Effect for upvote is: ICE");
-                Serial.println(" ");
+                Serial.println(F("Effect for upvote is: ICE"));
+                Serial.println(F(" "));
               }
               if (EFFECT[0]==4){
-                Serial.println("Effect for upvote is: FIRE 1");
-                Serial.println(" ");
+                Serial.println(F("Effect for upvote is: FIRE 1"));
+                Serial.println(F(" "));
               }
                           
-              Serial.println("RGB value for follower trigger is set to");
-              Serial.println(" ");
-              Serial.print("R= ");
+              Serial.println(F("RGB value for follower trigger is set to"));
+              Serial.println(F(" "));
+              Serial.print(F("R= "));
               Serial.println(BRIGHTF[0]);
-              Serial.print("G= ");
+              Serial.print(F("G= "));
               Serial.println(BRIGHTF[1]);
-              Serial.print("B= ");
+              Serial.print(F("B= "));
               Serial.println(BRIGHTF[2]);
-              Serial.println("");
+              Serial.println(F(""));
               if (EFFECT[1]==1){
-                Serial.println("Effect for follower is: NORMAL BLINKING");
-                Serial.println(" ");
+                Serial.println(F("Effect for follower is: NORMAL BLINKING"));
+                Serial.println(F(" "));
                  }
               if (EFFECT[1]==2){
-                Serial.println("Effect for follower is: FADING");
-                Serial.println(" ");
+                Serial.println(F("Effect for follower is: FADING"));
+                Serial.println(F(" "));
                  }
               if (EFFECT[1]==3){
-                Serial.println("Effect for follower is: RAINBOW");
-                Serial.println(" ");
+                Serial.println(F("Effect for follower is: RAINBOW"));
+                Serial.println(F(" "));
               }
               if (EFFECT[1]==4){
-                Serial.println("Effect for follower is: ICE");
-                Serial.println(" ");
+                Serial.println(F("Effect for follower is: ICE"));
+                Serial.println(F(" "));
               }
               if (EFFECT[1]==5){
-                Serial.println("Effect for follower is: FIRE 1");
-                Serial.println(" ");
+                Serial.println(F("Effect for follower is: FIRE 1"));
+                Serial.println(F(" "));
               }
                             
-              Serial.println("RGB value for post trigger is set to");
-              Serial.println(" ");
-              Serial.print("R= ");
+              Serial.println(F("RGB value for post trigger is set to"));
+              Serial.println(F(" "));
+              Serial.print(F("R= "));
               Serial.println(BRIGHTP[0]);
-              Serial.print("G= ");
+              Serial.print(F("G= "));
               Serial.println(BRIGHTP[1]);
-              Serial.print("B= ");
+              Serial.print(F("B= "));
               Serial.println(BRIGHTP[2]);
-              Serial.println("");
+              Serial.println(F(""));
               if (EFFECT[2]==1){
-                Serial.println("Effect for post is: NORMAL BLINKING");
-                Serial.println(" ");
+                Serial.println(F("Effect for post is: NORMAL BLINKING"));
+                Serial.println(F(" "));
                 }
               if (EFFECT[2]==2){
-                Serial.println("Effect for post is: FADING");
-                Serial.println(" ");
+                Serial.println(F("Effect for post is: FADING"));
+                Serial.println(F(" "));
                }
               if (EFFECT[2]==3){
-                Serial.println("Effect for post is: RAINBOW");
-                Serial.println(" ");
+                Serial.println(F("Effect for post is: RAINBOW"));
+                Serial.println(F(" "));
               }  
               if (EFFECT[2]==4){
-                Serial.println("Effect for post is: ICE");
-                Serial.println(" ");
+                Serial.println(F("Effect for post is: ICE"));
+                Serial.println(F(" "));
               }
               if (EFFECT[2]==5){
-                Serial.println("Effect for post is: FIRE 1");
-                Serial.println(" ");
+                Serial.println(F("Effect for post is: FIRE 1"));
+                Serial.println(F(" "));
               }
          }
     }
@@ -514,8 +693,17 @@ if (data[0] == 'u') {
       fire(Nofblinks[0], blinkdelay[0]);
       }  
   }
- Serial.println("you got an upvote ");
- Serial.println(" "); 
+       
+       display.setTextSize(2);
+       display.setTextColor(WHITE);
+       display.setCursor(30,20);
+       display.println(F(" NEW      UPVOTE"));
+       display.display();
+       display.startscrollright(0x00, 0x0F); 
+       display.clearDisplay();
+ Serial.println(F("you got an upvote "));
+ Serial.println(F(" ")); 
+ 
 }
       
 //if Arduino receives the command f from serial (follower)   
@@ -556,8 +744,15 @@ if (data[0] == 'f') {
           fire(Nofblinks[1], blinkdelay[1]);
          }  
   }
- Serial.println("you got a new follower ");
- Serial.println(" "); 
+       display.setTextSize(2);
+       display.setTextColor(WHITE);
+       display.setCursor(30,20);
+       display.println(F(" NEW     FOLLOWER"));
+       display.display();
+       display.startscrollright(0x00, 0x0F); 
+       display.clearDisplay();
+ Serial.println(F("you got a new follower "));
+ Serial.println(F(" ")); 
 }
      
   
@@ -598,89 +793,144 @@ if (data[0] == 'p') {
         if (EFFECT[2]==5){ 
             fire(Nofblinks[2], blinkdelay[2]);
            }
-           
-      Serial.println("there is a new post ");
-      Serial.println(" "); 
      } 
+       display.setTextSize(2);
+       display.setTextColor(WHITE);
+       display.setCursor(30,20);
+       display.println(F("NEW       POST"));
+       display.display();
+       display.startscrollright(0x00, 0x0F); 
+       display.clearDisplay();
+      Serial.println(F("there is a new post "));
+      Serial.println(F(" ")); 
   }
 }
 
 void blink1(int Pin, int Nblink, int LEDdelay ){
+             display.stopscroll();
+             display.clearDisplay();
+             display.setTextSize(2);
+             display.setTextColor(WHITE);
+             display.setCursor(20,20);
+             display.println(F("BLINKING"));
+             display.display();
 
-
-    for (int a= 0; a< Nblink; a++){ //repeat the blinking effect as per the Nofblinks[0] value
-                if (Serial.available() > 0){ // 
-                    analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-                    analogWrite(GreenPIN, 0); //
-                    analogWrite(BluePIN, 0); //
-                    break;
-                    }
+   for (int a= 0; a< Nblink; a++){ //repeat the blinking effect as per the Nofblinks[0] value
+     if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
                     
-              //do the blinking  
+              //do the blinking               
                  analogWrite(Pin, 255); //turn on the led 
+                 display.invertDisplay(true);
                  delay(LEDdelay);
                  analogWrite(Pin, 0);//turn off the led
+                display.invertDisplay(false);
                  delay(LEDdelay);
+                 display.clearDisplay(); 
              }
 }
 
 void fade1(int Pin, int Nblink, int LEDdelay ){
 
-
+         display.stopscroll();
+         display.clearDisplay(); 
+         display.setTextSize(2);
+         display.setTextColor(WHITE);
+         display.setCursor(25,20);
+         display.println(F("FADING"));
+         display.display();
     for (int a= 0; a< Nblink; a++){ //repeat the fading effect as per the Nofblinks[2] value
+           
+             
            for (int f=0; f<=255; f++){
-              if (Serial.available() > 0){ // 
-                 analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-                 analogWrite(GreenPIN, 0); //
-                 analogWrite(BluePIN, 0); //
-                 break;
-                 }        
-                 
+            if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }    
+                            
               //do the fading
                 analogWrite(Pin, f);  //fade in the led
                 delay((LEDdelay/20));
+
                 }
-           for (int f=255; f>=0; f--){
+                display.invertDisplay(true);
+       for (int f=255; f>=0; f--){
+             if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
                 analogWrite(Pin, f);  //fade out the led
                 delay((LEDdelay/20));
                 } 
+                display.invertDisplay(false);
+                display.clearDisplay(); 
           }
 }
 
 void blink2(int Nblink, int LEDdelay, int R, int G, int B ){
+             display.stopscroll();
+             display.clearDisplay();
+             display.setTextSize(2);
+             display.setTextColor(WHITE);
+             display.setCursor(20,20);
+             display.println(F("BLINKING"));
+             display.display();
 
     for (int a= 0; a< Nblink; a++){ //repeat the fading effect as per the Nofblinks[2] value
-          if (Serial.available() > 0){ // 
-                 analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-                 analogWrite(GreenPIN, 0); //
-                 analogWrite(BluePIN, 0); //
-                 break;
-                 }
+         if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
                  
           //do the blinking  
            analogWrite(RedPIN, R);
            analogWrite(GreenPIN, G); //turn on the led using the stored R G B values
            analogWrite(BluePIN, B);
+           display.invertDisplay(true);
            delay(LEDdelay);
            analogWrite(RedPIN, 0);
            analogWrite(GreenPIN, 0);//turn of the led
            analogWrite(BluePIN, 0);
+           display.invertDisplay(false);
            delay(LEDdelay);
+           display.clearDisplay();
       }
 }
 
 void fade2(unsigned int PERIOD, double OMEGA, int Nblink, int R, int G, int B ){
-           
+             display.stopscroll();
+             display.clearDisplay(); 
+             display.setTextSize(2);
+             display.setTextColor(WHITE);
+             display.setCursor(25,20);
+             display.println(F("FADING"));
+             display.display();
+             
        int count=1;// variable to count the number of oscillations
        StartTime= millis();
      
       while (count <= Nblink){ //loop to be used to repeat the pattern as per Nofblinks[1] value
-               if (Serial.available() > 0){ /////////////////////////////////////// 
-                 analogWrite(RedPIN, 0);    //turn off the led when any new data //
-                 analogWrite(GreenPIN, 0);  //  is received and exit the loop    //
-                 analogWrite(BluePIN, 0);   ///////////////////////////////////////
-                 break;
-                 }   
+            if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
                  
                 CurrentTime= millis();
                /////////////////////////////////////////////////////
@@ -697,17 +947,20 @@ void fade2(unsigned int PERIOD, double OMEGA, int Nblink, int R, int G, int B ){
                if ((unsigned long)(millis() - StartTime) >= PERIOD){ ///////////////////////////////////////////////////////////////////////////
                 count++;                                             // every full oscillation increase the counter and take the current time //
                 StartTime= millis();                                 //  as the new starting point to calculate next period of oscilation     //
-               }                                                     ///////////////////////////////////////////////////////////////////////////
+                                                                     ///////////////////////////////////////////////////////////////////////////
+                }
                
                 analogWrite(RedPIN, FadeRed);
                 analogWrite(GreenPIN, FadeGreen);// activate the led
                 analogWrite(BluePIN, FadeBlue);
-                
+                display.invertDisplay(true);
 
                if (count == Nblink ){
                 analogWrite(RedPIN, 0);
                 analogWrite(GreenPIN, 0);// turn off the led
                 analogWrite(BluePIN, 0);
+                display.invertDisplay(false);
+                display.clearDisplay();
                 break;
                 }
           }
@@ -718,16 +971,24 @@ void rainbow(int Nblink, int LEDdelay){
          int redrainbow;
          int greenrainbow;
          int bluerainbow;
-         
+             display.stopscroll();
+             display.clearDisplay(); 
+             display.setTextSize(2);
+             display.setTextColor(WHITE);
+             display.setCursor(25,20);
+             display.println(F("RAINBOW"));
+             display.display();
+             
    for (int a= 0; a< Nblink; a++){  //repeat the rainbow effect as per the Nofblinks[0] value
       for (int y = 0; y < 768; y++){
         
-        if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led whenever data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
+        if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
        if (y <= 255){          //zone1
              redrainbow = 255 - y;    // red goes from on to off
              greenrainbow = y;        // green goes from off to on
@@ -752,6 +1013,7 @@ void rainbow(int Nblink, int LEDdelay){
             analogWrite(RedPIN, redrainbow);
             analogWrite(BluePIN, bluerainbow);
             analogWrite(GreenPIN, greenrainbow);
+            display.invertDisplay(true);
             delay((LEDdelay/30));                    
             }
          }
@@ -767,28 +1029,39 @@ void rainbow(int Nblink, int LEDdelay){
           analogWrite(RedPIN, redrainbow);
           analogWrite(BluePIN, bluerainbow);
           analogWrite(GreenPIN, greenrainbow);
+          display.invertDisplay(false);
+          display.clearDisplay();
 }
 
 void ice(int Nblink, int LEDdelay){
+             display.stopscroll();
+             display.clearDisplay(); 
+             display.setTextSize(2);
+             display.setTextColor(WHITE);
+             display.setCursor(30,20);
+             display.println(F("ICE"));
+             display.display();
   
         //repeat the ice effect as per Nblink value
    for (int a= 0; a< Nblink; a++){
-       if (Serial.available() > 0){   //////////////////////////
-          analogWrite(RedPIN, 0);     //   turn off the led   //
-          analogWrite(GreenPIN, 0);   //when data is received // 
-          analogWrite(BluePIN, 0);    //  and exit the loop   //
-          break;                      //////////////////////////
-          }
+       if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
           
         //loop for fade in effect  
     for (int y=0; y<=510; y++){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-            
+      if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
+            display.invertDisplay(true);
            // fade in to blue-ice colour
         if(y<=255){
            analogWrite(RedPIN, 0); 
@@ -803,15 +1076,17 @@ void ice(int Nblink, int LEDdelay){
           } 
          delay ((LEDdelay/20));
          
+         
      }
     for (int x=510; x>=0; x--){
-       if (Serial.available() > 0){ // 
-           analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-           analogWrite(GreenPIN, 0); //
-           analogWrite(BluePIN, 0); //
-            break;
-            }
-            
+      if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
+         display.invertDisplay(false);   
            //fade to blue-ice colour
         if(x>255){
            analogWrite(RedPIN, (x-255)); 
@@ -831,18 +1106,28 @@ void ice(int Nblink, int LEDdelay){
      analogWrite(RedPIN, 0); // turn off the led
      analogWrite(GreenPIN, 0); // just to make sure it is off
      analogWrite(BluePIN, 0); //
+     display.clearDisplay();
 }
 
 void fire(int Nblink, int LEDdelay){
-  
+             display.stopscroll(); //stop scrolling previous text (just in case)
+             display.clearDisplay(); //clear the display
+             display.setTextSize(2); //set text size
+             display.setTextColor(WHITE); //set text colour
+             display.setCursor(30,20); //set where to display text
+             display.println(F("FIRE")); // write text
+             display.display(); //display the text
+             
  for (int a= 0; a< Nblink; a++){ //repeat the rainbow effect as per the Nofblinks[1] value
      for (int y=0; y<=295; y++){
-           if (Serial.available() > 0){ // 
-                 analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-                 analogWrite(GreenPIN, 0); //
-                 analogWrite(BluePIN, 0); //
-                 break;
-               }
+           if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
+      display.invertDisplay(true); //invert colours of display
           // fade in till full red brightness
        if(y<=255){
           analogWrite(RedPIN, y);
@@ -853,14 +1138,15 @@ void fire(int Nblink, int LEDdelay){
          }
           delay ((LEDdelay/20));  
     }
-
+    display.invertDisplay(false); //invert again display colours
     for (int x=295; x>=0; x--){
-           if (Serial.available() > 0){ // 
-                 analogWrite(RedPIN, 0);    //turn off the led when data is received and exit the loop
-                 analogWrite(GreenPIN, 0); //
-                 analogWrite(BluePIN, 0); //
-                 break;
-               }
+           if (Serial.available() > 0){ // when data is received
+      analogWrite(RedPIN, 0);    //turn off the led  
+      analogWrite(GreenPIN, 0); //
+      analogWrite(BluePIN, 0); //
+      display.clearDisplay(); // clear display
+      break; //and exit the loop
+      }
           // fade back to red
        if(x>=255){
           analogWrite(GreenPIN, (x-255));
@@ -871,9 +1157,12 @@ void fire(int Nblink, int LEDdelay){
          }     
       delay ((LEDdelay/20));  
     }
+    display.invertDisplay(true); //invert again display colours
  }
      analogWrite(RedPIN, 0); // turn off the led
      analogWrite(GreenPIN, 0); // (just to make sure)
+     display.invertDisplay(false); //bring colours to normality
+     display.clearDisplay(); //clear display
 }
 
 
