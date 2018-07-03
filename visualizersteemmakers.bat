@@ -8,6 +8,9 @@
 	
 :: Get the sound set by the user in the Blinkit GUI, stored in \config\ and put it into variable %sound%
 	set /p sound=<config\sound.txt
+	
+:: Get the by the user saved logitech mode LED or LCD	
+	set /p mode=<config\logitechmode.txt
     
 :: Colour settings
 	set ESC=
@@ -48,7 +51,21 @@ IF "%steemmakersdevice%"=="usbstick" (
 
  	:: Logitech
 IF "%steemmakersdevice%"=="logitech" (
-    (start logitechblink.exe)
+
+	IF "%mode%"=="LED" (
+    start /min logitechblink.exe
+)
+
+	IF "%mode%"=="LCD" (
+    start /min logitechlcd.exe
+)
+
+	IF "%mode%"=="LED,LCD" (
+    start /min logitechblink.exe
+	start /min logitechlcd.exe
+	
+)
+)
 )
 
 
@@ -130,8 +147,22 @@ IF "%steemmakersdevice%"=="usbstick" (
 
  	:: Logitech
 IF "%steemmakersdevice%"=="logitech" (
-    (start logitechblink.exe)
+
+	IF "%mode%"=="LED" (
+    start /min logitechblink.exe
 )
+
+	IF "%mode%"=="LCD" (
+    start /min logitechlcd.exe
+)
+
+	IF "%mode%"=="LED,LCD" (
+    start /min logitechblink.exe
+	start /min logitechlcd.exe
+	
+)
+)
+
 
 
  	:: Webcam	

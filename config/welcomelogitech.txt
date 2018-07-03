@@ -5,7 +5,7 @@
  ||    ||  ||        ||   |   |||   ||  ||    ||     ||   
 .||...|'  .||.....| .||. .|.   '|  .||.  ||. .||.   .||.
                                                   
-USB Flash Notifications Version 2.7 
+USB Flash Notifications Version 2.8 
 Made by Techtek https://steemit.com/@techtek/ 
 
 Logitech code is developed by Flash4yard https://steemit.com/@flash4yard/

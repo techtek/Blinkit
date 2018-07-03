@@ -9,6 +9,9 @@
 :: Get the sound set by the user in the Blinkit GUI, stored in \config\ and put it into variable %sound%
 	set /p sound=<config\sound.txt
 	
+:: Get the by the user saved logitech mode LED or LCD	
+	set /p mode=<config\logitechmode.txt	
+	
 	
     
 :: Colour settings
@@ -46,10 +49,24 @@
 	echo.
 	
 
-:: Test the Logitech blink action
-	echo %Magenta%Testing %White%Blink led 
-	start logitechblink.exe
-	echo.
+:: Test the Logitech blink action, "LED" / "LCD" or "LED,LCD"
+	echo %Magenta%Testing the %White% %mode%
+	
+	IF "%mode%"=="LED" (
+    start /min logitechblink.exe
+)
+
+	IF "%mode%"=="LCD" (
+    start /min logitechlcd.exe
+)
+
+	IF "%mode%"=="LED,LCD" (
+    start /min logitechblink.exe
+	start /min logitechlcd.exe
+	
+)
+
+    echo.
 
 
 ::  Download the latest STEEM and SBD Price and put it inside a txt files
@@ -123,7 +140,20 @@
 	echo %Magenta%ACTION LED BLINKED! 
   
 :: Let the user know, there is a new Post, and blink the Logitech device
-	start logitechblink.exe
+
+	IF "%mode%"=="LED" (
+    start /min logitechblink.exe
+)
+
+	IF "%mode%"=="LCD" (
+    start /min logitechlcd.exe
+)
+
+	IF "%mode%"=="LED,LCD" (
+    start /min logitechblink.exe
+	start /min logitechlcd.exe
+	
+)
 
 	
 :: Play the notification sound if turned on by the user 
