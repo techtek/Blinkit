@@ -9,6 +9,9 @@ Blinkit can blink the lights of the following products:
 - Arduino Prototyping boards
 - Logitech devices (full list of supported devices https://www.scribd.com/document/251929274/Logitech-Gaming-Led-SDK)
 
+
+Blinkit website: https://techtek.github.io/Blinkit
+
 Installation instructions for Windows
 
 1. Download the content of the Blinkit folder 
