@@ -6,6 +6,7 @@ How to use this with your Heltec WiFi Kit 8 board
 - Upload the Blinkit Arduino sketch to your Heltec WiFi Kit 8 
 
 - restart the module and, the blinkit splashscreen should show up and the device is starting 
+- To connnect your phone, the device wil display it's IP while booting, use this to browse to the device with your mobile phone, tablet or pc.
 
 
 
@@ -15,8 +16,9 @@ Connect the LED light to GPIO 0, on the board printed as pin 03
 and connect the piezo speaker to GPIO 15, on the board printed as pin 05
 
 If you need assistance with how to do this safely without possibly damaging the board, 
-
 and for technical support:
 
 https://discord.gg/73h8XqP
+
+
 
