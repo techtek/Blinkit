@@ -32,6 +32,7 @@ U8G2_SSD1306_128X32_UNIVISION_F_SW_I2C u8g2(U8G2_R0, /* clock=*/ 5, /* data=*/ 4
 
 
 
+
 char blynk_token[34] = "Steem user"; // needed to store the values in that WiFiManger accepts.   Example of this implementation and extra info is found here: https://community.blynk.cc/t/feeding-wifi-ssid-passwords-and-blynk-keys-via-a-webpage-in-the-esp8266-eeprom/3019/8
 
 bool shouldSaveConfig = false; //flag for saving data
@@ -58,6 +59,14 @@ void saveConfigCallback () {  //callback notifying us of the need to save config
 
 // Variable to store the current sound setting
   String soundonoff = "on";
+
+// Variable to store the set notification sound
+  String notificationsound = "victorysound";  
+
+// Variable to store the set display theme
+  String displaytheme = "defaulttheme";
+
+
 
 // Assign output variables to GPIO pins
   const int ledPin = 0;       //notification LED light
@@ -176,7 +185,7 @@ void setup() {
 
 //read configuration from filesystem
 
-        //SPIFFS.format();    //clean FS, for testing
+//SPIFFS.format();    //clean FS, for testing
  
   Serial.println("Mounting FS...");    
 
@@ -210,6 +219,9 @@ void setup() {
     Serial.println("Failed to mount FS");
   }
   //end read
+
+
+   //end read
 
   // The extra parameters to be configured (can be either global or just in the setup)
   // After connecting, parameter.getValue() will get you the configured value
@@ -343,7 +355,7 @@ steemuser = blynk_token;
           if (currentLine.length() == 0) {
             // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
             // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
+            client.println("HTTP/1.0 200 OK");
             client.println("Content-type:text/html");
             client.println("Connection: close");
             client.println();
@@ -373,11 +385,52 @@ steemuser = blynk_token;
 
 
             // Plays notification Sound
-              else if (header.indexOf("GET /4/on") >= 0) {
+              if (header.indexOf("GET /4/on") >= 0) {
               Serial.println("playsound");
               sound();
             } 
 
+
+            // Set notification sound to victory, notification sound
+              if (header.indexOf("GET /victorysound") >= 0) {                    // if the header is recieved
+              Serial.println("victory notification sound set");                  // print text to serial console
+              notificationsound = "victorysound";                                // save chosen sound into the notificationsound string
+              sound();                                                           // play the sound 
+            } 
+
+            // Set notification sound to 1x single beep, notification sound
+              if (header.indexOf("GET /1xsinglebeep") >= 0) {                    // if the header is recieved
+              Serial.println("1x single beep notification sound set");           // print text to serial console
+              notificationsound = "1xsinglebeep";                                // save chosen sound into the notificationsound string
+              sound();                                                           // play the sound
+            }
+
+            // Set notification sound to 3x slow beep, notification sound
+              if (header.indexOf("GET /3xslowbeep") >= 0) {                      // if the header is received
+              Serial.println("3x slow beep, notification sound set");            // print text to serial console
+              notificationsound = "3xslowbeep";                                  // save chosen sound into the notificationsound string
+              sound();                                                           // play the sound
+            }            
+
+
+
+            // Show default theme
+              if (header.indexOf("GET /defaulttheme") >= 0) {                   // if the header is received
+              Serial.println("default theme set");                              // print text to serial console
+              displaytheme = "defaulttheme";                                    // saves the theme inside the displaytheme string
+            } 
+
+            // Show bignumber theme
+              if (header.indexOf("GET /bignumbertheme") >= 0) {                 // if the header is received
+              Serial.println("big number theme set");                           // print text to serial console
+              displaytheme = "bignumbertheme";                                  // saves the theme inside the displaytheme string
+            } 
+
+            // Show empty screen theme
+              if (header.indexOf("GET /emptyscreentheme") >= 0) {               // if the header is received
+              Serial.println("empty screen theme set");                         // print text to serial console
+              displaytheme = "emptyscreentheme";                                // saves the theme inside the displaytheme string
+            } 
 
 
 
@@ -408,56 +461,121 @@ steemuser = blynk_token;
             
             // CSS to style the web-interface
             client.println("<style>html { font-family: Helvetica; color: white; display: inline-block; margin: 0px auto; background-color: #4f4e4e; text-align: center;}");
-            client.println(".button { background-color: #833d95; border: none; color: white; padding: 16px 40px;");
-            client.println("text-decoration: none; font-size: 30px; margin: 2px; cursor: pointer;}");
-            client.println("a {color: grey;}");
-            client.println(".button2 {background-color: #833d95;}</style></head>");
+            client.println(".button { background-color: #833d95; border: none; color: white; padding: 10px 40px;");
+            client.println("text-decoration: none; font-size: 15px; margin: 2px; cursor: pointer;}");
+            client.println("a {color: lightgrey; font-size: 16px;}");
+            client.println(".button2 {background-color: #5d5d5d; font-size: 10px; margin: 2px;}");
+
+            client.println(".collapsible { background-color: #444242; color: darkgrey; cursor: pointer; padding: 18px; width: 100%; border-style: solid; border: none; text-align: left; outline: none; font-size: 15px;}");
+            client.println(".active, .collapsible:hover { background-color: #555;}");
+            client.println(".content {  padding: 0 18px; display: none; overflow: hidden; background-color: #918e8e;}</style></head>");
+
         
             // Web Page Heading
             client.println("<body>");
-            client.println("<img src=\"https://cdn.steemitimages.com/DQmdaUvqdxEvtKeZgtZ1qGcrU8Aew4LqQAKMq8zz5vf6haR/Blinkitlogo-01-01.png\" alt=\"Blinkit Logo\" width=\"266\" height=\"auto\">");
+           
+            client.println("<a href=\"\">");
+            client.println("<img src=\"https://cdn.steemitimages.com/DQmdaUvqdxEvtKeZgtZ1qGcrU8Aew4LqQAKMq8zz5vf6haR/Blinkitlogo-01-01.png\" alt=\"Blinkit Logo and Home Button\" style=\"width:266px;height:auto;border:0;\"></a>");       
             client.println("<br><br />");
 
-            // Display the Steem username and the total recieved upvotes for it            
+              
+
+            // Display the Steem users avatar image
+            client.println("<table style=\"width:600px\">");
+            client.println("<table align=\"center\">");
+            client.println("<tr>");
+            client.println("<td><img src=\"https://steemitimages.com/u/" + steemuser + "/avatar\" alt=\"Users avatar\" style=\"width:75px;height:auto;border:0;\"></a> &nbsp; </td>");
+
+            // Display the Steem username and the total recieved upvotes for it             
+            client.println("<td align=\"left\">");
             client.println("<p>Steem User <b>" + steemuser + "</b></p>");
-            client.println("<p>Received Upvotes <b>" + payload2 + "</b></p>");  
-            client.println("<p><font color=\"grey\">_____________________________________</font></p>");  // Display a line
-            
-            // Display the Notifcation sound on/off toggle button, and display the Test notification sound button, If the soundonoff state is off, it displays the ON button otherwise the OFF button       
-              if (soundonoff=="off") {  
-              client.println("<p>Sound notifications are <b><font color=\"red\"> " + soundonoff + " </font></b></p>");           
-              client.println("<p><a href=\"/3/on\"><button class=\"button\">ON</button></a>");
-              client.println("<a href=\"/4/on\"><button class=\"button\">TEST</button></a></p>");
-              
-            } else {
-              client.println("<p>Sound notifications are <b><font color=\"green\"> " + soundonoff + " </font></b></p>"); 
-              client.println("<p><a href=\"/3/off\"><button class=\"button button\">OFF</button></a>");
-              client.println("<a href=\"/4/on\"><button class=\"button\">TEST</button></a></p>");
-            } 
-            
-            client.println("&nbsp;"); //single emptyline    
+            client.println("<p>Received Upvotes <b>" + payload2 + "</b></p>"); 
+            client.println("</td>");
+            client.println("</tr></table>");
 
 
-            // Display a button to test the notification light
-            if (ledPinState=="off") {
-              client.println("<p>Test notification light</p>");
-              
-              client.println("<p><a href=\"/5/on\"><button class=\"button button3\">TEST</button></a>");
-            } else {
-              client.println("<p>Test notification light</p>");
-              
-              client.println("<p><a href=\"/5/off\"><button class=\"button button3\">TEST</button></a>");
-            }
 
 
-            client.println("<br><br />"); //single emptyline  
-            client.println("<br><br />"); //single emptyline  
-            client.println("<p><font color=\"grey\">_____________________________________</font></p>");   // Display a line
+            // collapsible settings menu
+            client.println("<button class=\"collapsible\">SOUND</button>");
+            client.println("<div class=\"content\">");
             
-            // Show a link to reset the device 
-            client.println("<p><a href=\"/reset\">Reset the device</a></p>");                             
+            if (soundonoff=="off") {  
+                          client.println("<p>Sound notifications are <b><font color=\"red\"> " + soundonoff + " </font></b></p>");           
+                          client.println("<p><a href=\"/3/on\"><button class=\"button\">ON</button></a>");
+                          client.println("<a href=\"/4/on\"><button class=\"button\">TEST</button></a></p>");
+                          
+                        } else {
+                          client.println("<p>Sound notifications are <b><font color=\"green\"> " + soundonoff + " </font></b></p>"); 
+                          client.println("<p><a href=\"/3/off\"><button class=\"button button\">OFF</button></a>");
+                          client.println("<a href=\"/4/on\"><button class=\"button\">TEST</button></a></p>");
+                        } 
             
-           
+            client.println("<p>Notification Sound</p>");
+            client.println("<p><a href=\"/victorysound\"><button class=\"button button2\">Victory</button></a>");
+            client.println("<a href=\"/3xslowbeep\"><button class=\"button button2\">3x Slow</button></a>");
+            client.println("<a href=\"/1xsinglebeep\"><button class=\"button button2\">Single Beep</button></a></p>"); 
+            
+            client.println("</div>");
+            
+            
+            client.println("<button class=\"collapsible\">LIGHT</button>");
+            client.println("<div class=\"content\">");
+            
+                        // Display a button to test the notification light
+                        if (ledPinState=="off") {
+                          client.println("<p>Test notification light</p>");
+                          
+                          client.println("<p><a href=\"/5/on\"><button class=\"button button3\">TEST</button></a>");
+                        } else {
+                          client.println("<p>Test notification light</p>");
+                          
+                          client.println("<p><a href=\"/5/off\"><button class=\"button button3\">TEST</button></a>");
+                        }
+            
+            client.println("</div>");
+            
+            client.println("<button class=\"collapsible\">DISPLAY</button>");
+            client.println("<div class=\"content\">");
+            
+            client.println("<p>Display Theme</p>");
+            client.println("<p><a href=\"/defaulttheme\"><button class=\"button button2\">DEFAULT</button></a>");
+            client.println("<a href=\"/bignumbertheme\"><button class=\"button button2\">BIG</button></a>");
+            client.println("<a href=\"/emptyscreentheme\"><button class=\"button button2\">OFF</button></a></p>"); 
+            client.println("</div>");
+            
+            
+            client.println("<button class=\"collapsible\">OTHER</button>");
+            client.println("<div class=\"content\">");
+            
+            client.println("<p><a href=\"https://steemit.com/@blinkit\">Latest news</a></p>");            
+            client.println("&nbsp;"); //single emptyline             
+            client.println("<p><a href=\"https://discord.gg/hnDfwbc\">Technical support</a></p>");            
+            client.println("<br><br />");                     
+            client.println("<p><a href=\"/reset\">Reset the device</a></p>");   // Show a link to reset the device             
+            client.println("</div>");
+            
+            
+            
+            // script for the collapsible menu
+            client.println("<script>");
+            client.println("var coll = document.getElementsByClassName(\"collapsible\"); ");
+            client.println("var i; ");
+            
+            client.println("for (i = 0; i < coll.length; i++) { ");
+            client.println("coll[i].addEventListener(\"click\", function() { ");
+            client.println("this.classList.toggle(\"active\"); ");
+            client.println("var content = this.nextElementSibling; ");
+            client.println("if (content.style.display === \"block\") { ");
+            client.println("content.style.display = \"none\"; ");
+            client.println(" } else { ");
+            client.println("content.style.display = \"block\"; ");
+            client.println(" } ");
+            client.println(" }); ");
+            client.println(" } ");
+            client.println(" </script>");
+
+            client.println("<br><br />"); //single emptyline
 
 
             client.println("</body></html>");
@@ -477,7 +595,11 @@ steemuser = blynk_token;
     // Clear the header variable
     header = "";
     // Close the connection
+    
+    
     client.stop();
+
+    
     Serial.println("Client disconnected.");
     Serial.println("");
   }
@@ -492,7 +614,7 @@ steemuser = blynk_token;
      //If Wifi is connected get the data from the API 
     HTTPClient http;  //Declare an object of class HTTPClient
  
-    http.begin("http://api.comprendre-steem.fr/getStatus?username="+ steemuser);  //Specify request destination
+    http.begin("http://api.comprendre-steem.fr/getStatus?username="+ steemuser);                //Specify request destination
     int httpCode = http.GET();                                                                  //Send the request
 
 
@@ -512,13 +634,27 @@ steemuser = blynk_token;
       payload1.replace("\"", "");
       //Serial.println(payload1);    Print the response payload
 
- mainscreen();
+               
  
     }
  
     http.end();   //Close connection
  
   }
+
+
+//show the selected themes on the display
+   if (displaytheme=="defaulttheme") {
+              defaulttheme();
+            }
+
+   if (displaytheme=="bignumbertheme") {
+              bignumbertheme();
+            }    
+
+   if (displaytheme=="emptyscreentheme") {
+              emptyscreentheme();
+            } 
   
   delay(100);    
   compare();
@@ -527,8 +663,8 @@ steemuser = blynk_token;
 
 
  
-// function to show the mainscreen on the display
-void mainscreen() {
+// function to show the defaulttheme on the display
+void defaulttheme() {
 
               u8g2.clearBuffer();          // clear the internal memory
  
@@ -536,7 +672,7 @@ void mainscreen() {
  long rssi = WiFi.RSSI();
 
 
-//Screen 1 (the mainscreen loops to 3 screens)
+//Screen 1 (the defaulttheme loops to 3 screens)
 if (rssi<= -60) {  //Strong signal 
              u8g2.drawXBM( 116, 0, u8g_wifistrongsignalicon_width, u8g_wifistrongsignalicon_height, u8g_wifistrongsignalicon_bits);  
 }
@@ -558,8 +694,6 @@ if (rssi<= -80) { // Bad signal
 
              u8g2.drawStr( 0, 0, "drawLine");
              u8g2.drawLine(0, 12, 128, 12);
-  
-
              u8g2.setFont(u8g2_font_freedoomr10_tu); // select font
              u8g2.drawXBM( 0, 17, u8g_upvotesicon_width, u8g_upvotesicon_height, u8g_upvotesicon_bits);
              u8g2.setCursor(20, 31);
@@ -598,8 +732,6 @@ if (rssi<= -80) { // Bad signal
 
              u8g2.drawStr( 0, 0, "drawLine");
              u8g2.drawLine(0, 12, 128, 12);
-  
-
              u8g2.setFont(u8g2_font_freedoomr10_tu); // select font
              u8g2.drawXBM( 0, 17, u8g_upvotesicon_width, u8g_upvotesicon_height, u8g_upvotesicon_bits);
              u8g2.setCursor(20, 31);
@@ -636,8 +768,6 @@ if (rssi<= -80) { // Bad signal
 
              u8g2.drawStr( 0, 0, "drawLine");
              u8g2.drawLine(0, 12, 128, 12);
-  
-
              u8g2.setFont(u8g2_font_freedoomr10_tu); // select font
              u8g2.drawXBM( 0, 17, u8g_upvotesicon_width, u8g_upvotesicon_height, u8g_upvotesicon_bits);
              u8g2.setCursor(20, 31);
@@ -649,12 +779,51 @@ if (rssi<= -80) { // Bad signal
              u8g2.sendBuffer();          // transfer internal memory to the display
              delay(900);
              u8g2.clearBuffer();          // clear the internal memory
+
+            // compare(); 
+}
+
+
+
+// function to show the bignumbertheme on the display
+void bignumbertheme() {
+
+             u8g2.clearBuffer();                                          // clear the internal memory             
+             u8g2.setFont(u8g2_font_freedoomr25_tn);                      // select font
+             u8g2.setCursor(0, 31);                                       // position on the display
+             u8g2.print(payload1);                                        // Show the Received upvotes       
+             u8g2.print(".");                                             // Show the progres.  
+             u8g2.sendBuffer();                                           // transfer internal memory to the display
+             delay(900);
+             u8g2.clearBuffer();                                          // clear the internal memory                  
+                      
+             u8g2.setFont(u8g2_font_freedoomr25_tn);                      // select font
+             u8g2.setCursor(0, 31);                                       // position on the display
+             u8g2.print(payload1);                                        // Show the Received upvotes  
+             u8g2.print("..");                                            // Show the progres..
+             u8g2.sendBuffer();                                           // transfer internal memory to the display
+             delay(900);
+             u8g2.clearBuffer();                                          // clear the internal memory
+                          
+             u8g2.setFont(u8g2_font_freedoomr25_tn);                      // select font
+             u8g2.setCursor(0, 31);                                       // position on the display
+             u8g2.print(payload1);                                        // Show the Received upvotes
+             u8g2.print("...");                                           // Show the progres...
+             u8g2.sendBuffer();                                           // transfer internal memory to the display
+             delay(900);
+             u8g2.clearBuffer();                                          // clear the internal memory
 }
 
 
 
 
+// function to show the emptyscreentheme on the display
+void emptyscreentheme() {
 
+             u8g2.clearBuffer();          // clear the internal memory             
+             delay(900);
+             u8g2.sendBuffer();          // transfer internal memory to the display
+}
 
 
 
@@ -685,16 +854,12 @@ blinks();
 
 // download new data into payload1
      if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
-
-
   
      //If Wifi is connected get the data from the API 
     HTTPClient http;  //Declare an object of class HTTPClient
  
     http.begin("http://api.comprendre-steem.fr/getStatus?username="+ steemuser);  //Specify request destination
     int httpCode = http.GET();                                                                  //Send the request
-
-
  
     if (httpCode > 0) { //Check the returning code 
      payload1 = http.getString();   //Get the request response payload
@@ -814,18 +979,37 @@ void blinks() {
 }
 
 
-// Function to store notification sound 
+// Function to store and play notification sounds
 void sound() {
    
             if (soundonoff=="off") {
               // do nothing
             } else {
-   tone(piezopin, 600, 100); // frequency, time
+
+if (notificationsound=="victorysound") { 
+   tone(piezopin, 600, 100);              // frequency, time
    delay(100);
-   tone(piezopin, 1300, 100); // frequency, time
+   tone(piezopin, 1300, 100);             // frequency, time
    delay(100);
-   tone(piezopin, 1600, 300); // frequency, time
+   tone(piezopin, 1600, 300);             // frequency, time
    delay(300);
+}
+
+if (notificationsound=="1xsinglebeep") { 
+   tone(piezopin, 1600, 300);             // frequency, time
+   delay(300);
+}
+
+if (notificationsound=="3xslowbeep") { 
+   tone(piezopin, 1300, 600);             // frequency, time
+   delay(2000);
+   tone(piezopin, 1300, 600);             // frequency, time
+   delay(2000);
+   tone(piezopin, 1300, 600);             // frequency, time
+   delay(2000);
+}
+              
+
             }    
 
    
