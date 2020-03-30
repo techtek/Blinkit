@@ -178,7 +178,7 @@
 	
 	
 :: Play windows notification sound
-    powershell -c echo `a  >NUL		
+    powershell -c echo `a 		
 	
 
 :: Download followers data from Steem API and save it into a txt file

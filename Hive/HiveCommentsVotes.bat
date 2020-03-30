@@ -178,7 +178,7 @@ cls
 	
 	
 :: Play windows notification sound
-    powershell -c echo `a >NUL	
+    powershell -c echo `a 	
 	
 
 

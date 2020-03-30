@@ -178,7 +178,7 @@
 	
 	
 :: Play windows notification sound
-    powershell -c echo `a 	
+    powershell -c echo `a
 	
 	echo %White%
 
