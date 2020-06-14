@@ -296,16 +296,25 @@ https://github.com/techtek/Blinkit
 				<th>  <div id="steemit-widgets-bloglist" class="uk-grid" style="width:320px; background-color: white;"> </th> 
 			 </tr>
  			</table>
-										<div style="width: auto; max-width: 600px;">
-							<div class="github-widget" data-repo="hustcc/iReact"></div>
-							<br>
-							<div class="github-widget" data-repo="hustcc/placeholder.js"></div>
-							<br>
-							<script type="text/javascript" src="../GithubRepoWidget.js"></script>
-							<div class="github-widget" data-repo="hustcc/wrapcache"></div>
-						</div>
-						</div><!-- #container -->
-						<script type="text/javascript">setTimeout(GithubRepoWidget.init, 5000);</script>
+						  
+				 
+				 
+				 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+				  <!-- Testing and development -->
+				  <script src="js/github.js"></script>
+				  <script src="js/md5.js"></script>
+				  <script src="js/github.commits.widget.js"></script>
+
+				  <!-- Combined and minified  
+				  <script src="js/github.commits.widget-min.js"></script>
+				  -->
+  
+				  <script>
+					$(function() {
+						$('#github-commits').githubInfoWidget(
+							{ user: 'alexanderbeletsky', repo: 'github.commits.widget', branch: 'master', last: 15, limitMessageTo: 30 });
+					});
+				  </script> 
 			</div>			
           </div>
         </form>
