@@ -84,7 +84,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  opacity: .9;
+  opacity: .8;
   background: #000000;
 }
 
@@ -116,7 +116,7 @@
 .shards-app-promo-page--1 .welcome .iphone-mockup {
   max-width: 85%;
 }
-
+.shards-app-promo-page--1 .welcome:before
 .shards-app-promo-page--1 .section-title {
   position: relative;
 }
