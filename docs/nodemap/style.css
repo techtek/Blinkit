@@ -35,6 +35,10 @@ body {
   transform: translate(-50%, -50%) scale3D(1.35, 1.35, 1);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
+
+
+
+
 .map-container .venezuela {
   top: 54%;
   left: 24%;
@@ -59,9 +63,9 @@ body {
   top: 28%;
   left: 9%;
 }
-.map-container .usa {
-  top: 26%;
-  left: 17%;
+.map-container .virginia {
+  top: 32%;
+  left: 22%;
 }
 .map-container .arabia {
   top: 40%;
@@ -79,7 +83,7 @@ body {
   top: 40%;
   left: 72%;
 }
-.map-container .japon {
+.map-container .tokyo {
   top: 34%;
   left: 86%;
 }
