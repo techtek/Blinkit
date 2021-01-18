@@ -91,6 +91,11 @@ body {
   top: 72%;
   left: 86%;
 }
+.map-container .bavaria {
+  top: 25%;
+  left: 48%;
+}
+
 
 @keyframes pulse {
   0% {
